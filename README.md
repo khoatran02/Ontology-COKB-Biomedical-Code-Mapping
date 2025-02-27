@@ -1,6 +1,8 @@
 # OntologyRAG Prototype
 
-This repository contains the materials for our OntologyRAG prototype - a customised ontology-enhanced retrieval-augmented genera-tion pipeline that leverages the in-context reasoning capabilities of off-the-shelf LLMs by infusing ontology knowledge graphs to enable coding experts executing better and faster code mapping.
+This repository contains the materials for our OntologyRAG prototype - a customised ontology-enhanced retrieval-augmented generation pipeline that leverages the in-context reasoning capabilities of off-the-shelf LLMs by infusing ontology knowledge graphs to enable coding experts executing better and faster code mapping.
+
+Full paper describing the pipeline _OntologyRAG: Better and Faster Biomedical Code Mapping with Retrieval-Augmented Generation (RAG) Leveraging Ontology Knowledge Graphs and Large Language Models_ can be accessed [here](https://arxiv.org/abs/2502.18992).
 
 ## Pre-requisites
 
