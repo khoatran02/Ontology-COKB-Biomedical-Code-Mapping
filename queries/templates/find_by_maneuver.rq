@@ -1,0 +1,8 @@
+PREFIX vko: <https://example.org/traffic-sign-kg/ontology#>
+
+SELECT DISTINCT ?sign ?rule
+WHERE {
+  ?sign vko:conveysRule ?rule .
+  ?rule vko:prohibitsManeuver ?maneuver .
+}
+

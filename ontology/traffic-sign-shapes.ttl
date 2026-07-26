@@ -1,0 +1,60 @@
+@prefix vko: <https://example.org/traffic-sign-kg/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+vko:TrafficSignObservationShape
+    a sh:NodeShape ;
+    sh:targetClass vko:TrafficSignObservation ;
+    sh:property [
+        sh:path vko:observesSignType ;
+        sh:class vko:TrafficSignType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Observation phải liên kết đúng một loại biển báo."@vi
+    ] ;
+    sh:property [
+        sh:path vko:inImage ;
+        sh:class vko:Image ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path vko:hasBoundingBox ;
+        sh:class vko:BoundingBox ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path vko:generatedBy ;
+        sh:minCount 1 ;
+        sh:message "Observation phải có provenance."@vi
+    ] ;
+    sh:property [
+        sh:path vko:confidence ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 1 ;
+        sh:maxCount 1
+    ] .
+
+vko:BoundingBoxShape
+    a sh:NodeShape ;
+    sh:targetClass vko:BoundingBox ;
+    sh:property [ sh:path vko:xMin ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path vko:yMin ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path vko:xMax ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path vko:yMax ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Bounding box phải thỏa xMin < xMax và yMin < yMax."@vi ;
+        sh:select """
+            PREFIX vko: <https://example.org/traffic-sign-kg/ontology#>
+            SELECT $this
+            WHERE {
+                $this vko:xMin ?xMin ; vko:xMax ?xMax ;
+                      vko:yMin ?yMin ; vko:yMax ?yMax .
+                FILTER (?xMin >= ?xMax || ?yMin >= ?yMax)
+            }
+        """
+    ] .
+

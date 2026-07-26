@@ -1,0 +1,40 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      TSKG_ENVIRONMENT: development
+      TSKG_OPERATIONS_DB: /app/runtime/operations.db
+      TSKG_VECTOR_INDEX_DIR: /app/runtime/vector-indexes
+      TSKG_ASSET_DIR: /app/data
+      TSKG_FUSEKI_QUERY_URL: http://fuseki:3030/traffic-signs/query
+      TSKG_FUSEKI_UPDATE_URL: http://fuseki:3030/traffic-signs/update
+      TSKG_FUSEKI_GSP_URL: http://fuseki:3030/traffic-signs/data
+    ports:
+      - "8000:8000"
+    volumes:
+      - api-runtime:/app/runtime
+      - ../data:/app/data:ro
+    depends_on:
+      - fuseki
+
+  fuseki:
+    build:
+      context: fuseki
+      args:
+        JENA_VERSION: "6.1.0"
+    command:
+      - --tdb2
+      - --update
+      - --loc
+      - /fuseki/databases/traffic-signs
+      - /traffic-signs
+    ports:
+      - "127.0.0.1:3030:3030"
+    volumes:
+      - fuseki-data:/fuseki/databases
+
+volumes:
+  api-runtime:
+  fuseki-data:
