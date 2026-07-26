@@ -1,18 +1,18 @@
 # Ontology-Grounded Traffic Sign Knowledge Graph
 
-Backend nền cho hệ thống biểu diễn, kiểm chứng, suy luận và truy xuất lai biển báo
-giao thông Việt Nam.
+Backend foundation for representing, validating, reasoning over, and hybrid-retrieving
+Vietnamese traffic signs.
 
-Kiến trúc lưu trữ:
+Storage architecture:
 
-- Apache Jena Fuseki/TDB2 là nguồn chân lý RDF/OWL.
-- FAISS là vector index dẫn xuất.
-- SQLite lưu job, ánh xạ `faiss_id ↔ rdf_uri` và index manifest.
-- File system lưu ảnh/crop. Base source chưa ingest dataset.
+- Apache Jena Fuseki/TDB2 is the RDF/OWL source of truth.
+- FAISS is a derived vector index.
+- SQLite stores jobs, `faiss_id ↔ rdf_uri` mappings, and index manifests.
+- The file system stores images/crops. The base source does not ingest datasets yet.
 
-## Chạy local
+## Run locally
 
-Yêu cầu Python 3.11–3.13. Ví dụ với `uv`:
+Requires Python 3.11–3.13. Example with `uv`:
 
 ```bash
 uv venv --python 3.12
@@ -21,7 +21,7 @@ cp .env.example .env
 uv run traffic-sign-kg
 ```
 
-Mở:
+Open:
 
 ```text
 http://localhost:8000/docs
@@ -29,22 +29,23 @@ http://localhost:8000/api/v1/health/live
 http://localhost:8000/api/v1/health/ready
 ```
 
-Khởi động Fuseki:
+Start Fuseki:
 
 ```bash
 docker compose -f deployment/compose.yaml up -d fuseki
 ```
 
-Nạp ontology nền:
+Load the base ontology:
 
 ```bash
 ./scripts/load_ontology.sh
 ```
 
-## Smoke test không cần dataset/model
+## Smoke test without dataset/model
 
-Development profile có `DeterministicEmbeddingProvider`. Provider này chỉ tạo vector ổn
-định từ text để kiểm tra pipeline; không được dùng làm kết quả nghiên cứu.
+The development profile includes `DeterministicEmbeddingProvider`. This provider only
+builds stable vectors from text so you can exercise the pipeline; it must not be used
+as research results.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/vector-indexes/ontology-concepts/rebuild \
@@ -63,7 +64,7 @@ curl -X POST http://localhost:8000/api/v1/vector-indexes/ontology-concepts/rebui
   }'
 ```
 
-Sau đó:
+Then:
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/search/vector \
@@ -75,14 +76,13 @@ curl -X POST http://localhost:8000/api/v1/search/vector \
   }'
 ```
 
-## Dataset và model thật
+## Real dataset and model
 
-Dataset adapter, YOLO parsing, crop generation và pretrained embedding model được để
-ở phase tiếp theo. Các adapter phải tạo stable RDF URI và `VectorBuildItem`; không ghi
-ontology fact trực tiếp vào FAISS.
+Dataset adapters, YOLO parsing, crop generation, and pretrained embedding models are
+left for a later phase. Adapters must produce stable RDF URIs and `VectorBuildItem`
+records; they must not write ontology facts directly into FAISS.
 
-Tài liệu chi tiết:
+Detailed docs:
 
 - [Architecture](docs/architecture.md)
 - [Proposal](docs/Ontology-Grounded-Traffic-Sign-Knowledge-Graph-Proposal.md)
-
