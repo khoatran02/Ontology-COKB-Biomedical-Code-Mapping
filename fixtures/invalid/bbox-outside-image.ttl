@@ -1,0 +1,11 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vko: <https://w3id.org/vn-ts-cokb/ontology#> .
+@prefix ex: <https://w3id.org/vn-ts-cokb/resource/fixture-invalid/> .
+
+ex:image-1 a vko:Image ; vko:hasRegion ex:region-1 ;
+    vko:imageWidth 100 ; vko:imageHeight 100 ;
+    vko:sourcePath "invalid.jpg" ;
+    vko:contentHash "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" .
+ex:region-1 a vko:ImageRegion ; vko:regionOf ex:image-1 ; vko:depicts ex:sign-1 ;
+    vko:xMin 10 ; vko:yMin 10 ; vko:xMax 150 ; vko:yMax 90 .
+ex:sign-1 a vko:TrafficSignOccurrence .

@@ -1,0 +1,665 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rule: <https://w3id.org/vn-ts-cokb/resource/rule/> .
+@prefix vko: <https://w3id.org/vn-ts-cokb/ontology#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/vn-ts-cokb/catalog/vietnamese-signs> a owl:Ontology ;
+    owl:imports <https://w3id.org/vn-ts-cokb/ontology> ;
+    owl:versionInfo "1.0.0" .
+
+vko:ActualClearanceHeightSign a owl:Class ;
+    rdfs:label "Low Clearance"@en,
+        "Chiều cao tĩnh không thực tế"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.239b" ;
+    vko:mappingStatus vko:NeedsReview ;
+    vko:rawCode "W.239b*" ;
+    vko:sourceClassId 43 .
+
+vko:BusStopSign a owl:Class ;
+    rdfs:label "Bus Stop"@en,
+        "Bến xe buýt"@vi ;
+    rdfs:subClassOf vko:IndicationSign ;
+    vko:baseCode "I.434a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "I.434a" ;
+    vko:sourceClassId 8 .
+
+vko:ChildrenWarningSign a owl:Class ;
+    rdfs:label "Children Present"@en,
+        "Trẻ em"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.225" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.225" ;
+    vko:sourceClassId 27 .
+
+vko:ConsecutiveDangerousBendsRightFirstSign a owl:Class ;
+    rdfs:label "Double curve first to right"@en,
+        "Nhiều chỗ ngoặt nguy hiểm liên tiếp, chỗ đầu tiên sang phải"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.202b" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.202b" ;
+    vko:sourceClassId 33 .
+
+vko:DangerousLeftBendWarningSign a owl:Class ;
+    rdfs:label "Danger zone on the left"@en,
+        "Chỗ ngoặt nguy hiểm vòng bên trái"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.201a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.201a" ;
+    vko:sourceClassId 6 .
+
+vko:DangerousRightBendWarningSign a owl:Class ;
+    rdfs:label "Danger zone on the right"@en,
+        "Chỗ ngoặt nguy hiểm vòng bên phải"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.201b" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.201b" ;
+    vko:sourceClassId 50 .
+
+vko:EqualRoadIntersectionWarningSign a owl:Class ;
+    rdfs:label "Intersection"@en,
+        "Giao nhau với đường đồng cấp"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.205a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.205a" ;
+    vko:sourceClassId 4 .
+
+vko:GuardedRailwayCrossingWarningSign a owl:Class ;
+    rdfs:label "Level Crossing with Barriers"@en,
+        "Giao nhau với đường sắt có rào chắn"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.210" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.210" ;
+    vko:sourceClassId 48 .
+
+vko:HeightLimitSign a owl:Class ;
+    rdfs:label "Height Limit"@en,
+        "Giới hạn chiều cao"@vi ;
+    rdfs:subClassOf vko:ProhibitionSign ;
+    vko:baseCode "P.117" ;
+    vko:mappingStatus vko:NeedsReview ;
+    vko:rawCode "P.117*" ;
+    vko:sourceClassId 16 .
+
+vko:InspectionSign a owl:Class ;
+    rdfs:label "Customs Checkpoint"@en,
+        "Kiểm tra"@vi ;
+    rdfs:subClassOf vko:ProhibitionSign ;
+    vko:baseCode "P.129" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "P.129" ;
+    vko:sourceClassId 24 .
+
+vko:KeepRightObstacleWarningSign a owl:Class ;
+    rdfs:label "Warning: Obstacle ahead – pass on the right"@en,
+        "Chú ý chướng ngại vật – vòng tránh sang bên phải"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.246c" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.246c" ;
+    vko:sourceClassId 51 .
+
+vko:KeepRightSign a owl:Class ;
+    rdfs:label "Right Turn Only"@en,
+        "Phải đi vòng sang bên phải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:keep-right ;
+            owl:onProperty vko:conveysRule ],
+        vko:MandatorySign ;
+    vko:baseCode "R.302a" ;
+    vko:canonicalRule rule:keep-right ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "R.302a" ;
+    vko:sourceClassId 3 .
+
+vko:LeftSideJunctionWarningSign a owl:Class ;
+    rdfs:label "Intersection with T-Junction"@en,
+        "Đường giao nhau (ngã ba bên trái)"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.205b" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.205b" ;
+    vko:sourceClassId 37 .
+
+vko:LeftTurnOnlySign a owl:Class ;
+    rdfs:label "Left Turn"@en,
+        "Các xe chỉ được rẽ trái"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:left-turn-only ;
+            owl:onProperty vko:conveysRule ],
+        vko:MandatorySign ;
+    vko:baseCode "R.301e" ;
+    vko:canonicalRule rule:left-turn-only ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "R.301e" ;
+    vko:sourceClassId 42 .
+
+vko:MotorcycleOnlySign a owl:Class ;
+    rdfs:label "Motorcycles Only"@en,
+        "Chỉ dành cho xe máy"@vi ;
+    rdfs:subClassOf vko:SupplementarySign ;
+    vko:baseCode "S.505a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "S.505a*Xe máy" ;
+    vko:sourceClassId 25 .
+
+vko:NoBusOrTruckSign a owl:Class ;
+    rdfs:label "No Passenger Cars and Trucks"@en,
+        "Cấm ô tô khách và ô tô tải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-bus-or-truck ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.107" ;
+    vko:canonicalRule rule:no-bus-or-truck ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.107" ;
+    vko:sourceClassId 18 .
+
+vko:NoCarSign a owl:Class ;
+    rdfs:label "No Cars Allowed"@en,
+        "Cấm ô tô"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-car ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.103a" ;
+    vko:canonicalRule rule:no-car ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.103a" ;
+    vko:sourceClassId 20 .
+
+vko:NoCarUTurnSign a owl:Class ;
+    rdfs:label "No U-Turn for Cars"@en,
+        "Cấm ô tô quay đầu xe (được rẽ trái)"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-car-u-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.124b1" ;
+    vko:canonicalRule rule:no-car-u-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.124b1" ;
+    vko:sourceClassId 47 .
+
+vko:NoEntrySign a owl:Class ;
+    rdfs:label "No Entry"@en,
+        "Cấm đi ngược chiều"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-entry ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.102" ;
+    vko:canonicalRule rule:no-entry ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.102" ;
+    vko:sourceClassId 2 .
+
+vko:NoLeftOrRightTurnSign a owl:Class ;
+    rdfs:label "No Left or Right Turn"@en,
+        "Cấm rẽ trái và phải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-left-or-right-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.137" ;
+    vko:canonicalRule rule:no-left-or-right-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.137" ;
+    vko:sourceClassId 35 .
+
+vko:NoLeftTurnOrUTurnSign a owl:Class ;
+    rdfs:label "No U-Turn and No Left Turn"@en,
+        "Cấm rẽ trái và quay đầu xe"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-left-turn-or-u-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.124c" ;
+    vko:canonicalRule rule:no-left-turn-or-u-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.124c" ;
+    vko:sourceClassId 49 .
+
+vko:NoLeftTurnSign a owl:Class ;
+    rdfs:label "No Left Turn"@en,
+        "Cấm rẽ trái"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-left-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.123a" ;
+    vko:canonicalRule rule:no-left-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.123a" ;
+    vko:sourceClassId 7 .
+
+vko:NoMotorcycleSign a owl:Class ;
+    rdfs:label "No Motorcycles Allowed"@en,
+        "Cấm mô tô và xe máy"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-motorcycle ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.104" ;
+    vko:canonicalRule rule:no-motorcycle ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.104" ;
+    vko:sourceClassId 29 .
+
+vko:NoParkingSign a owl:Class ;
+    rdfs:label "No Parking"@en,
+        "Cấm đỗ xe"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-parking ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.131a" ;
+    vko:canonicalRule rule:no-parking ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.131a" ;
+    vko:sourceClassId 46 .
+
+vko:NoRightTurnOrUTurnSign a owl:Class ;
+    rdfs:label "No U-Turn and No Right Turn"@en,
+        "Cấm rẽ phải và quay đầu"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-right-turn-or-u-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.124d" ;
+    vko:canonicalRule rule:no-right-turn-or-u-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.124d" ;
+    vko:sourceClassId 19 .
+
+vko:NoRightTurnSign a owl:Class ;
+    rdfs:label "No Right Turn"@en,
+        "Cấm rẽ phải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-right-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.123b" ;
+    vko:canonicalRule rule:no-right-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.123b" ;
+    vko:sourceClassId 32 .
+
+vko:NoSemiTrailerSign a owl:Class ;
+    rdfs:label "No Containers Allowed"@en,
+        "Cấm xe sơ-mi rơ-moóc"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-semi-trailer ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "B.8a" ;
+    vko:canonicalRule rule:no-semi-trailer ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "B.8a" ;
+    vko:sourceClassId 34 .
+
+vko:NoStoppingOrParkingSign a owl:Class ;
+    rdfs:label "No Stopping and No Parking"@en,
+        "Cấm dừng và đỗ xe"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-stopping-or-parking ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.130" ;
+    vko:canonicalRule rule:no-stopping-or-parking ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.130" ;
+    vko:sourceClassId 10 .
+
+vko:NoStraightOrRightTurnSign a owl:Class ;
+    rdfs:label "No Straight and Right Turn"@en,
+        "Cấm đi thẳng và rẽ phải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-straight-or-right-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.139" ;
+    vko:canonicalRule rule:no-straight-or-right-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.139" ;
+    vko:sourceClassId 36 .
+
+vko:NoTruckSign a owl:Class ;
+    rdfs:label "No Trucks Allowed"@en,
+        "Cấm xe tải"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-truck ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.106a" ;
+    vko:canonicalRule rule:no-truck ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.106a*Xe tải" ;
+    vko:sourceClassId 14 .
+
+vko:NoTwoOrThreeWheelVehicleSign a owl:Class ;
+    rdfs:label "No Two or Three-wheeled Vehicles"@en,
+        "Cấm xe hai và ba bánh"@vi ;
+    rdfs:subClassOf vko:ProhibitionSign ;
+    vko:baseCode "P.111" ;
+    vko:mappingStatus vko:NeedsReview ;
+    vko:rawCode "P.111" ;
+    vko:sourceClassId 23 .
+
+vko:NoUTurnSign a owl:Class ;
+    rdfs:label "No U-Turn"@en,
+        "Cấm quay đầu"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:no-u-turn ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.124a" ;
+    vko:canonicalRule rule:no-u-turn ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.124a*" ;
+    vko:sourceClassId 17 .
+
+vko:NonPriorityRoadIntersectionWarningSign a owl:Class ;
+    rdfs:label "Intersection with a non-priority road"@en,
+        "Giao nhau với đường không ưu tiên"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.207" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.207" ;
+    vko:sourceClassId 5 .
+
+vko:ObstacleAheadSign a owl:Class ;
+    rdfs:label "Obstacle on the Road"@en,
+        "Chướng ngoại vật phía trước"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.246a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.246a" ;
+    vko:sourceClassId 26 .
+
+vko:OneWaySign a owl:Class ;
+    rdfs:label "One-way street"@en,
+        "Đường một chiều"@vi ;
+    rdfs:subClassOf vko:IndicationSign ;
+    vko:baseCode "I.407a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "I.407a" ;
+    vko:sourceClassId 45 .
+
+vko:OtherDangerWarningSign a owl:Class ;
+    rdfs:label "Other Danger"@en,
+        "Nguy hiểm khác"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.233" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.233" ;
+    vko:sourceClassId 44 .
+
+vko:PedestrianCrossingWarningSign a owl:Class ;
+    rdfs:label "Pedestrian Crossing"@en,
+        "Đường người đi bộ cắt ngang"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.224" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.224" ;
+    vko:sourceClassId 0 .
+
+vko:RightSideJunctionWarningSign a owl:Class ;
+    rdfs:label "Equal-level Intersection"@en,
+        "Đường giao nhau (ngã ba bên phải)"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.205c" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.205c" ;
+    vko:sourceClassId 1 .
+
+vko:RoadNarrowsLeftWarningSign a owl:Class ;
+    rdfs:label "Narrow Road on the Left"@en,
+        "Đường bị thu hẹp về phía trái"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.203b" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.203b" ;
+    vko:sourceClassId 21 .
+
+vko:RoadNarrowsRightWarningSign a owl:Class ;
+    rdfs:label "Narrow Road on the Right"@en,
+        "Đường bị thu hẹp về phía phải"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.203c" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.203c" ;
+    vko:sourceClassId 15 .
+
+vko:RoundaboutMandatorySign a owl:Class ;
+    rdfs:label "Roundabout"@en,
+        "Nơi giao nhau chạy theo vòng xuyến"@vi ;
+    rdfs:subClassOf vko:MandatorySign ;
+    vko:baseCode "R.303" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "R.303" ;
+    vko:sourceClassId 9 .
+
+vko:SlowDownWarningSign a owl:Class ;
+    rdfs:label "Slow Down"@en,
+        "Đi chậm"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.245a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.245a" ;
+    vko:sourceClassId 13 .
+
+vko:SpeedBumpAheadSign a owl:Class ;
+    rdfs:label "Uneven Road"@en,
+        "Gồ giảm tốc phía trước"@vi ;
+    rdfs:subClassOf vko:WarningSign ;
+    vko:baseCode "W.221b" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "W.221b" ;
+    vko:sourceClassId 22 .
+
+vko:SpeedLimit40Sign a owl:Class ;
+    rdfs:label "Speed limit (40km/h)"@en,
+        "Giới hạn tốc độ (40km/h)"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:speed-40 ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.127" ;
+    vko:canonicalRule rule:speed-40 ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.127*40" ;
+    vko:sourceClassId 41 .
+
+vko:SpeedLimit50Sign a owl:Class ;
+    rdfs:label "Speed limit (50km/h)"@en,
+        "Giới hạn tốc độ (50km/h)"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:speed-50 ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.127" ;
+    vko:canonicalRule rule:speed-50 ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.127*50" ;
+    vko:sourceClassId 38 .
+
+vko:SpeedLimit60Sign a owl:Class ;
+    rdfs:label "Speed limit (60km/h)"@en,
+        "Giới hạn tốc độ (60km/h)"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:speed-60 ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.127" ;
+    vko:canonicalRule rule:speed-60 ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.127*60" ;
+    vko:sourceClassId 39 .
+
+vko:SpeedLimit80Sign a owl:Class ;
+    rdfs:label "Speed limit (80km/h)"@en,
+        "Giới hạn tốc độ (80km/h)"@vi ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue rule:speed-80 ;
+            owl:onProperty vko:conveysRule ],
+        vko:ProhibitionSign ;
+    vko:baseCode "P.127" ;
+    vko:canonicalRule rule:speed-80 ;
+    vko:mappingStatus vko:Mapped ;
+    vko:rawCode "P.127*80" ;
+    vko:sourceClassId 40 .
+
+vko:SurveillanceCameraSign a owl:Class ;
+    rdfs:label "Road with Surveillance Camera"@en,
+        "Đường có camera giám sát"@vi ;
+    rdfs:subClassOf vko:IndicationSign ;
+    vko:baseCode "Camera" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "Camera" ;
+    vko:sourceClassId 31 .
+
+vko:TruckAndPublicVehicleSign a owl:Class ;
+    rdfs:label "Trucks and Containers"@en,
+        "Xe tải và xe công"@vi ;
+    rdfs:subClassOf vko:SupplementarySign ;
+    vko:baseCode "S.505a" ;
+    vko:mappingStatus vko:NeedsReview ;
+    vko:rawCode "S.505a*Xe tải và công" ;
+    vko:sourceClassId 28 .
+
+vko:TruckOnlySign a owl:Class ;
+    rdfs:label "Trucks Only"@en,
+        "Chỉ dành cho xe tải"@vi ;
+    rdfs:subClassOf vko:SupplementarySign ;
+    vko:baseCode "S.505a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "S.505a*Xe tải" ;
+    vko:sourceClassId 30 .
+
+vko:UTurnPlaceSign a owl:Class ;
+    rdfs:label "U-Turn Allowed"@en,
+        "Chỗ quay xe"@vi ;
+    rdfs:subClassOf vko:IndicationSign ;
+    vko:baseCode "I.409" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "I.409" ;
+    vko:sourceClassId 11 .
+
+vko:VehicleLaneMergeSign a owl:Class ;
+    rdfs:label "Lane Allocation"@en,
+        "Biển gộp làn đường theo phương tiện"@vi ;
+    rdfs:subClassOf vko:MandatorySign ;
+    vko:baseCode "R.415a" ;
+    vko:mappingStatus vko:TaxonomyOnly ;
+    vko:rawCode "R.415a" ;
+    vko:sourceClassId 12 .
+
+rule:keep-right a vko:ObligationRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:requiresManeuver vko:PassRight .
+
+rule:left-turn-only a vko:ObligationRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:requiresManeuver vko:TurnLeft .
+
+rule:no-bus-or-truck a vko:ProhibitionRule ;
+    vko:appliesTo vko:Bus,
+        vko:Truck ;
+    vko:prohibitsVehicleCategory vko:Bus,
+        vko:Truck .
+
+rule:no-car a vko:ProhibitionRule ;
+    vko:appliesTo vko:PassengerCar ;
+    vko:prohibitsVehicleCategory vko:PassengerCar .
+
+rule:no-car-u-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:PassengerCar ;
+    vko:prohibitsManeuver vko:UTurn .
+
+rule:no-entry a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:EnterRoad .
+
+rule:no-left-or-right-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:TurnLeft,
+        vko:TurnRight .
+
+rule:no-left-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:TurnLeft .
+
+rule:no-left-turn-or-u-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:TurnLeft,
+        vko:UTurn .
+
+rule:no-motorcycle a vko:ProhibitionRule ;
+    vko:appliesTo vko:Motorcycle ;
+    vko:prohibitsVehicleCategory vko:Motorcycle .
+
+rule:no-parking a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:Park .
+
+rule:no-right-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:TurnRight .
+
+rule:no-right-turn-or-u-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:TurnRight,
+        vko:UTurn .
+
+rule:no-semi-trailer a vko:ProhibitionRule ;
+    vko:appliesTo vko:SemiTrailer ;
+    vko:prohibitsVehicleCategory vko:SemiTrailer .
+
+rule:no-stopping-or-parking a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:Park,
+        vko:Stop .
+
+rule:no-straight-or-right-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:GoStraight,
+        vko:TurnRight .
+
+rule:no-truck a vko:ProhibitionRule ;
+    vko:appliesTo vko:Truck ;
+    vko:prohibitsVehicleCategory vko:Truck .
+
+rule:no-u-turn a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:prohibitsManeuver vko:UTurn .
+
+rule:speed-40 a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:hasRestrictionValue 40.0 ;
+    vko:hasUnit vko:KilometrePerHour .
+
+rule:speed-50 a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:hasRestrictionValue 50.0 ;
+    vko:hasUnit vko:KilometrePerHour .
+
+rule:speed-60 a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:hasRestrictionValue 60.0 ;
+    vko:hasUnit vko:KilometrePerHour .
+
+rule:speed-80 a vko:ProhibitionRule ;
+    vko:appliesTo vko:Vehicle ;
+    vko:hasRestrictionValue 80.0 ;
+    vko:hasUnit vko:KilometrePerHour .
+

@@ -19,17 +19,16 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     runtime_dir: Path = Path("runtime")
-    operations_db: Path = Path("runtime/operations.db")
-    vector_index_dir: Path = Path("runtime/vector-indexes")
-    asset_dir: Path = Path("data")
+    dataset_dir: Path = Path("data/archive")
+    ontology_path: Path = Path("ontology/traffic-sign-ontology.ttl")
+    catalog_path: Path = Path("ontology/catalog/vietnamese-sign-catalog.csv")
+    catalog_ttl_path: Path = Path("ontology/catalog/vietnamese-sign-catalog.ttl")
+    shapes_path: Path = Path("ontology/traffic-sign-shapes.ttl")
 
     fuseki_query_url: str = "http://localhost:3030/traffic-signs/query"
     fuseki_update_url: str = "http://localhost:3030/traffic-signs/update"
     fuseki_gsp_url: str = "http://localhost:3030/traffic-signs/data"
     fuseki_timeout_seconds: float = Field(default=10.0, gt=0)
-
-    allow_deterministic_embeddings: bool = True
-    default_embedding_dimension: int = Field(default=64, ge=8)
 
     @field_validator("environment")
     @classmethod
@@ -41,8 +40,6 @@ class Settings(BaseSettings):
 
     def ensure_runtime_directories(self) -> None:
         self.runtime_dir.mkdir(parents=True, exist_ok=True)
-        self.operations_db.parent.mkdir(parents=True, exist_ok=True)
-        self.vector_index_dir.mkdir(parents=True, exist_ok=True)
 
 
 @lru_cache

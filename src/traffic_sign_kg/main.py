@@ -5,40 +5,46 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from rdflib import Graph
 
 from traffic_sign_kg.api.dependencies import ApplicationContainer
-from traffic_sign_kg.api.routes import health_router, indexes_router, search_router
-from traffic_sign_kg.config import Settings, get_settings
-from traffic_sign_kg.repositories.faiss_repository import (
-    FaissVectorRepository,
-    VectorIndexError,
+from traffic_sign_kg.api.routes import (
+    catalog_router,
+    health_router,
+    ingestions_router,
+    problems_router,
 )
+from traffic_sign_kg.config import Settings, get_settings
+from traffic_sign_kg.mapping.catalog import SignCatalog
 from traffic_sign_kg.repositories.fuseki_repository import (
     FusekiRepository,
     FusekiUnavailableError,
 )
-from traffic_sign_kg.repositories.operations_repository import OperationsRepository
-from traffic_sign_kg.services.embedding import DeterministicEmbeddingProvider
-from traffic_sign_kg.services.query_service import QueryService
+from traffic_sign_kg.services.knowledge_service import KnowledgeService
+from traffic_sign_kg.services.problem_service import ProblemService
 
 
 def build_container(settings: Settings) -> ApplicationContainer:
     settings.ensure_runtime_directories()
-    operations = OperationsRepository(settings.operations_db)
-    vectors = FaissVectorRepository(settings.vector_index_dir, operations)
+    catalog = SignCatalog.from_csv(settings.catalog_path)
+    ontology_graph = Graph().parse(settings.ontology_path)
+    ontology_graph.parse(settings.catalog_ttl_path)
+    shapes_graph = Graph().parse(settings.shapes_path)
     fuseki = FusekiRepository(
         settings.fuseki_query_url,
         settings.fuseki_update_url,
         settings.fuseki_gsp_url,
         settings.fuseki_timeout_seconds,
     )
-    embeddings = (
-        DeterministicEmbeddingProvider(settings.default_embedding_dimension)
-        if settings.allow_deterministic_embeddings
-        else None
+    return ApplicationContainer(
+        settings=settings,
+        catalog=catalog,
+        problem_service=ProblemService(catalog),
+        knowledge_service=KnowledgeService(),
+        ontology_graph=ontology_graph,
+        shapes_graph=shapes_graph,
+        fuseki=fuseki,
     )
-    queries = QueryService(vectors, fuseki)
-    return ApplicationContainer(settings, operations, vectors, fuseki, embeddings, queries)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -51,16 +57,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(
         title=settings.app_name,
-        version="0.1.0",
+        version="1.0.0",
         description=(
-            "RDF/OWL source of truth with FAISS candidate retrieval. "
-            "Vector-only results are not knowledge-graph verified."
+            "COKB/OWL semantic demo for Vietnamese traffic signs. "
+            "The MVP reasons from curated annotations and does not require a detector."
         ),
         lifespan=lifespan,
     )
     app.include_router(health_router, prefix="/api/v1")
-    app.include_router(indexes_router, prefix="/api/v1")
-    app.include_router(search_router, prefix="/api/v1")
+    app.include_router(catalog_router, prefix="/api/v1")
+    app.include_router(problems_router, prefix="/api/v1")
+    app.include_router(ingestions_router, prefix="/api/v1")
 
     @app.exception_handler(ValueError)
     async def value_error_handler(_: Request, exc: ValueError) -> JSONResponse:
@@ -69,20 +76,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             content={"error": {"code": "INVALID_REQUEST", "message": str(exc)}},
         )
 
-    @app.exception_handler(VectorIndexError)
-    async def vector_error_handler(_: Request, exc: VectorIndexError) -> JSONResponse:
-        return JSONResponse(
-            status_code=503,
-            content={"error": {"code": "VECTOR_INDEX_UNAVAILABLE", "message": str(exc)}},
-        )
-
     @app.exception_handler(FusekiUnavailableError)
     async def fuseki_error_handler(_: Request, exc: FusekiUnavailableError) -> JSONResponse:
         return JSONResponse(
             status_code=503,
             content={"error": {"code": "KNOWLEDGE_GRAPH_UNAVAILABLE", "message": str(exc)}},
         )
-
     return app
 
 

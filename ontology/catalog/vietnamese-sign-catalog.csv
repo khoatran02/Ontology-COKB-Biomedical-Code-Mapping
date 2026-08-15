@@ -1,0 +1,53 @@
+class_id,class_name,raw_code,base_code,label_vi,label_en,family,rule_id,mapping_status
+0,PedestrianCrossingWarningSign,W.224,W.224,Đường người đi bộ cắt ngang,Pedestrian Crossing,WarningSign,,TaxonomyOnly
+1,RightSideJunctionWarningSign,W.205c,W.205c,Đường giao nhau (ngã ba bên phải),Equal-level Intersection,WarningSign,,TaxonomyOnly
+2,NoEntrySign,P.102,P.102,Cấm đi ngược chiều,No Entry,ProhibitionSign,no-entry,Mapped
+3,KeepRightSign,R.302a,R.302a,Phải đi vòng sang bên phải,Right Turn Only,MandatorySign,keep-right,Mapped
+4,EqualRoadIntersectionWarningSign,W.205a,W.205a,Giao nhau với đường đồng cấp,Intersection,WarningSign,,TaxonomyOnly
+5,NonPriorityRoadIntersectionWarningSign,W.207,W.207,Giao nhau với đường không ưu tiên,Intersection with a non-priority road,WarningSign,,TaxonomyOnly
+6,DangerousLeftBendWarningSign,W.201a,W.201a,Chỗ ngoặt nguy hiểm vòng bên trái,Danger zone on the left,WarningSign,,TaxonomyOnly
+7,NoLeftTurnSign,P.123a,P.123a,Cấm rẽ trái,No Left Turn,ProhibitionSign,no-left-turn,Mapped
+8,BusStopSign,I.434a,I.434a,Bến xe buýt,Bus Stop,IndicationSign,,TaxonomyOnly
+9,RoundaboutMandatorySign,R.303,R.303,Nơi giao nhau chạy theo vòng xuyến,Roundabout,MandatorySign,,TaxonomyOnly
+10,NoStoppingOrParkingSign,P.130,P.130,Cấm dừng và đỗ xe,No Stopping and No Parking,ProhibitionSign,no-stopping-or-parking,Mapped
+11,UTurnPlaceSign,I.409,I.409,Chỗ quay xe,U-Turn Allowed,IndicationSign,,TaxonomyOnly
+12,VehicleLaneMergeSign,R.415a,R.415a,Biển gộp làn đường theo phương tiện,Lane Allocation,MandatorySign,,TaxonomyOnly
+13,SlowDownWarningSign,W.245a,W.245a,Đi chậm,Slow Down,WarningSign,,TaxonomyOnly
+14,NoTruckSign,P.106a*Xe tải,P.106a,Cấm xe tải,No Trucks Allowed,ProhibitionSign,no-truck,Mapped
+15,RoadNarrowsRightWarningSign,W.203c,W.203c,Đường bị thu hẹp về phía phải,Narrow Road on the Right,WarningSign,,TaxonomyOnly
+16,HeightLimitSign,P.117*,P.117,Giới hạn chiều cao,Height Limit,ProhibitionSign,,NeedsReview
+17,NoUTurnSign,P.124a*,P.124a,Cấm quay đầu,No U-Turn,ProhibitionSign,no-u-turn,Mapped
+18,NoBusOrTruckSign,P.107,P.107,Cấm ô tô khách và ô tô tải,No Passenger Cars and Trucks,ProhibitionSign,no-bus-or-truck,Mapped
+19,NoRightTurnOrUTurnSign,P.124d,P.124d,Cấm rẽ phải và quay đầu,No U-Turn and No Right Turn,ProhibitionSign,no-right-turn-or-u-turn,Mapped
+20,NoCarSign,P.103a,P.103a,Cấm ô tô,No Cars Allowed,ProhibitionSign,no-car,Mapped
+21,RoadNarrowsLeftWarningSign,W.203b,W.203b,Đường bị thu hẹp về phía trái,Narrow Road on the Left,WarningSign,,TaxonomyOnly
+22,SpeedBumpAheadSign,W.221b,W.221b,Gồ giảm tốc phía trước,Uneven Road,WarningSign,,TaxonomyOnly
+23,NoTwoOrThreeWheelVehicleSign,P.111,P.111,Cấm xe hai và ba bánh,No Two or Three-wheeled Vehicles,ProhibitionSign,,NeedsReview
+24,InspectionSign,P.129,P.129,Kiểm tra,Customs Checkpoint,ProhibitionSign,,TaxonomyOnly
+25,MotorcycleOnlySign,S.505a*Xe máy,S.505a,Chỉ dành cho xe máy,Motorcycles Only,SupplementarySign,,TaxonomyOnly
+26,ObstacleAheadSign,W.246a,W.246a,Chướng ngoại vật phía trước,Obstacle on the Road,WarningSign,,TaxonomyOnly
+27,ChildrenWarningSign,W.225,W.225,Trẻ em,Children Present,WarningSign,,TaxonomyOnly
+28,TruckAndPublicVehicleSign,S.505a*Xe tải và công,S.505a,Xe tải và xe công,Trucks and Containers,SupplementarySign,,NeedsReview
+29,NoMotorcycleSign,P.104,P.104,Cấm mô tô và xe máy,No Motorcycles Allowed,ProhibitionSign,no-motorcycle,Mapped
+30,TruckOnlySign,S.505a*Xe tải,S.505a,Chỉ dành cho xe tải,Trucks Only,SupplementarySign,,TaxonomyOnly
+31,SurveillanceCameraSign,Camera,Camera,Đường có camera giám sát,Road with Surveillance Camera,IndicationSign,,TaxonomyOnly
+32,NoRightTurnSign,P.123b,P.123b,Cấm rẽ phải,No Right Turn,ProhibitionSign,no-right-turn,Mapped
+33,ConsecutiveDangerousBendsRightFirstSign,W.202b,W.202b,"Nhiều chỗ ngoặt nguy hiểm liên tiếp, chỗ đầu tiên sang phải",Double curve first to right,WarningSign,,TaxonomyOnly
+34,NoSemiTrailerSign,B.8a,B.8a,Cấm xe sơ-mi rơ-moóc,No Containers Allowed,ProhibitionSign,no-semi-trailer,Mapped
+35,NoLeftOrRightTurnSign,P.137,P.137,Cấm rẽ trái và phải,No Left or Right Turn,ProhibitionSign,no-left-or-right-turn,Mapped
+36,NoStraightOrRightTurnSign,P.139,P.139,Cấm đi thẳng và rẽ phải,No Straight and Right Turn,ProhibitionSign,no-straight-or-right-turn,Mapped
+37,LeftSideJunctionWarningSign,W.205b,W.205b,Đường giao nhau (ngã ba bên trái),Intersection with T-Junction,WarningSign,,TaxonomyOnly
+38,SpeedLimit50Sign,P.127*50,P.127,Giới hạn tốc độ (50km/h),Speed limit (50km/h),ProhibitionSign,speed-50,Mapped
+39,SpeedLimit60Sign,P.127*60,P.127,Giới hạn tốc độ (60km/h),Speed limit (60km/h),ProhibitionSign,speed-60,Mapped
+40,SpeedLimit80Sign,P.127*80,P.127,Giới hạn tốc độ (80km/h),Speed limit (80km/h),ProhibitionSign,speed-80,Mapped
+41,SpeedLimit40Sign,P.127*40,P.127,Giới hạn tốc độ (40km/h),Speed limit (40km/h),ProhibitionSign,speed-40,Mapped
+42,LeftTurnOnlySign,R.301e,R.301e,Các xe chỉ được rẽ trái,Left Turn,MandatorySign,left-turn-only,Mapped
+43,ActualClearanceHeightSign,W.239b*,W.239b,Chiều cao tĩnh không thực tế,Low Clearance,WarningSign,,NeedsReview
+44,OtherDangerWarningSign,W.233,W.233,Nguy hiểm khác,Other Danger,WarningSign,,TaxonomyOnly
+45,OneWaySign,I.407a,I.407a,Đường một chiều,One-way street,IndicationSign,,TaxonomyOnly
+46,NoParkingSign,P.131a,P.131a,Cấm đỗ xe,No Parking,ProhibitionSign,no-parking,Mapped
+47,NoCarUTurnSign,P.124b1,P.124b1,Cấm ô tô quay đầu xe (được rẽ trái),No U-Turn for Cars,ProhibitionSign,no-car-u-turn,Mapped
+48,GuardedRailwayCrossingWarningSign,W.210,W.210,Giao nhau với đường sắt có rào chắn,Level Crossing with Barriers,WarningSign,,TaxonomyOnly
+49,NoLeftTurnOrUTurnSign,P.124c,P.124c,Cấm rẽ trái và quay đầu xe,No U-Turn and No Left Turn,ProhibitionSign,no-left-turn-or-u-turn,Mapped
+50,DangerousRightBendWarningSign,W.201b,W.201b,Chỗ ngoặt nguy hiểm vòng bên phải,Danger zone on the right,WarningSign,,TaxonomyOnly
+51,KeepRightObstacleWarningSign,W.246c,W.246c,Chú ý chướng ngại vật – vòng tránh sang bên phải,Warning: Obstacle ahead – pass on the right,WarningSign,,TaxonomyOnly

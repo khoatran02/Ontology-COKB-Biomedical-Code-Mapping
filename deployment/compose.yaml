@@ -5,9 +5,11 @@ services:
       dockerfile: Dockerfile
     environment:
       TSKG_ENVIRONMENT: development
-      TSKG_OPERATIONS_DB: /app/runtime/operations.db
-      TSKG_VECTOR_INDEX_DIR: /app/runtime/vector-indexes
-      TSKG_ASSET_DIR: /app/data
+      TSKG_DATASET_DIR: /app/data/archive
+      TSKG_ONTOLOGY_PATH: /app/ontology/traffic-sign-ontology.ttl
+      TSKG_CATALOG_PATH: /app/ontology/catalog/vietnamese-sign-catalog.csv
+      TSKG_CATALOG_TTL_PATH: /app/ontology/catalog/vietnamese-sign-catalog.ttl
+      TSKG_SHAPES_PATH: /app/ontology/traffic-sign-shapes.ttl
       TSKG_FUSEKI_QUERY_URL: http://fuseki:3030/traffic-signs/query
       TSKG_FUSEKI_UPDATE_URL: http://fuseki:3030/traffic-signs/update
       TSKG_FUSEKI_GSP_URL: http://fuseki:3030/traffic-signs/data
@@ -16,6 +18,7 @@ services:
     volumes:
       - api-runtime:/app/runtime
       - ../data:/app/data:ro
+      - ../ontology:/app/ontology:ro
     depends_on:
       - fuseki
 

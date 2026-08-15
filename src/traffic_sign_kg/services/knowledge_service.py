@@ -14,7 +14,12 @@ class ValidationResult:
 class KnowledgeService:
     """Local RDF validation/reasoning boundary used before Fuseki materialization."""
 
-    def validate(self, data_graph: Graph, shapes_graph: Graph) -> ValidationResult:
+    def validate(
+        self,
+        data_graph: Graph,
+        shapes_graph: Graph,
+        ontology_graph: Graph | None = None,
+    ) -> ValidationResult:
         try:
             from pyshacl import validate
         except ImportError as exc:
@@ -24,6 +29,7 @@ class KnowledgeService:
         conforms, report_graph, report_text = validate(
             data_graph,
             shacl_graph=shapes_graph,
+            ont_graph=ontology_graph,
             inference="rdfs",
             abort_on_first=False,
             allow_infos=True,

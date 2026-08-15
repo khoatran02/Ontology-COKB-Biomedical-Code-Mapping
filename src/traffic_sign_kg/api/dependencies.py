@@ -1,24 +1,25 @@
 from dataclasses import dataclass
 
 from fastapi import Request
+from rdflib import Graph
 
 from traffic_sign_kg.config import Settings
-from traffic_sign_kg.repositories.faiss_repository import FaissVectorRepository
+from traffic_sign_kg.mapping.catalog import SignCatalog
 from traffic_sign_kg.repositories.fuseki_repository import FusekiRepository
-from traffic_sign_kg.repositories.operations_repository import OperationsRepository
-from traffic_sign_kg.services.embedding import EmbeddingProvider
-from traffic_sign_kg.services.query_service import QueryService
+from traffic_sign_kg.services.knowledge_service import KnowledgeService
+from traffic_sign_kg.services.problem_service import ProblemService
 
 
 @dataclass(slots=True)
 class ApplicationContainer:
     settings: Settings
-    operations: OperationsRepository
-    vectors: FaissVectorRepository
+    catalog: SignCatalog
+    problem_service: ProblemService
+    knowledge_service: KnowledgeService
+    ontology_graph: Graph
+    shapes_graph: Graph
     fuseki: FusekiRepository
-    embeddings: EmbeddingProvider | None
-    queries: QueryService
 
 
-def get_container(request: Request) -> ApplicationContainer:
+async def get_container(request: Request) -> ApplicationContainer:
     return request.app.state.container

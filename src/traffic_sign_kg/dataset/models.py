@@ -19,16 +19,25 @@ class BoundingBox(BaseModel):
 
 class NormalizedObservation(BaseModel):
     dataset_id: str = Field(min_length=1)
+    dataset_version: str = Field(default="unversioned", min_length=1)
     image_id: str = Field(min_length=1)
     region_id: str = Field(min_length=1)
     image_path: Path
     image_width: int = Field(gt=0)
     image_height: int = Field(gt=0)
     raw_class_code: str = Field(min_length=1)
+    source_class_id: int = Field(ge=0, le=51)
     class_uri: HttpUrl
     bbox: BoundingBox
     provenance_uri: HttpUrl
     confidence: float = Field(ge=0, le=1)
+    mapping_version: str = Field(default="catalog-1.0.0", min_length=1)
+    source_type: str = Field(default="dataset_annotation", min_length=1)
+    content_hash: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
+    assertion_status: str = Field(
+        default="Accepted",
+        pattern=r"^(Accepted|PendingReview|Rejected|Quarantined)$",
+    )
 
     @model_validator(mode="after")
     def bbox_inside_image(self) -> Self:

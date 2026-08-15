@@ -1,162 +1,293 @@
-@prefix vko: <https://example.org/traffic-sign-kg/ontology#> .
+@prefix vko: <https://w3id.org/vn-ts-cokb/ontology#> .
+@prefix vkr: <https://w3id.org/vn-ts-cokb/resource/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
 
-<https://example.org/traffic-sign-kg/ontology>
+<https://w3id.org/vn-ts-cokb/ontology>
     a owl:Ontology ;
-    owl:versionIRI <https://example.org/traffic-sign-kg/ontology/0.1.0> ;
-    owl:versionInfo "0.1.0" ;
-    dcterms:title "Vietnamese Traffic Sign Knowledge Ontology"@en ;
-    dcterms:title "Bản thể tri thức biển báo giao thông Việt Nam"@vi ;
+    owl:versionIRI <https://w3id.org/vn-ts-cokb/ontology/1.0.0> ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:title "Vietnamese Traffic Sign COKB Ontology"@en ;
+    dcterms:title "Ontology COKB biển báo giao thông Việt Nam"@vi ;
     dcterms:description
-        "Core TBox only. Dataset-specific sign classes and observations are loaded later."@en .
+        "COKB domain profile for representing and reasoning over Vietnamese traffic signs."@en .
 
-vko:TrafficSignType
-    a owl:Class ;
-    rdfs:label "Loại biển báo giao thông"@vi .
+### COKB core ###############################################################
 
-vko:ProhibitionSign
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficSignType ;
-    rdfs:label "Biển báo cấm"@vi .
+vko:ComputationalConcept a owl:Class ;
+    rdfs:label "Khái niệm tính toán"@vi .
 
-vko:WarningSign
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficSignType ;
-    rdfs:label "Biển báo nguy hiểm và cảnh báo"@vi .
+vko:KnowledgeObject a owl:Class ;
+    rdfs:subClassOf vko:ComputationalConcept ;
+    rdfs:label "Đối tượng tri thức"@vi .
 
-vko:MandatorySign
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficSignType ;
-    rdfs:label "Biển hiệu lệnh"@vi .
+vko:KnowledgeOperation a owl:Class ;
+    rdfs:label "Phép toán tri thức"@vi .
 
-vko:IndicationSign
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficSignType ;
-    rdfs:label "Biển chỉ dẫn"@vi .
+vko:KnowledgeFunction a owl:Class ;
+    rdfs:label "Hàm tri thức"@vi .
 
-vko:SupplementarySign
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficSignType ;
-    rdfs:label "Biển phụ"@vi .
+vko:KnowledgeRule a owl:Class ;
+    rdfs:label "Luật suy diễn"@vi .
 
-vko:TrafficSignObservation
-    a owl:Class ;
-    rdfs:label "Quan sát biển báo"@vi ;
-    rdfs:subClassOf
-        [ a owl:Restriction ;
-          owl:onProperty vko:observesSignType ;
-          owl:someValuesFrom vko:TrafficSignType
-        ],
-        [ a owl:Restriction ;
-          owl:onProperty vko:hasBoundingBox ;
-          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-          owl:onClass vko:BoundingBox
-        ] .
+vko:Fact a owl:Class ; rdfs:label "Sự kiện COKB"@vi .
+vko:Goal a owl:Class ; rdfs:label "Mục tiêu suy luận"@vi .
+vko:Problem a owl:Class ; rdfs:label "Bài toán COKB"@vi .
+vko:InferenceRun a owl:Class ; rdfs:label "Lần chạy suy diễn"@vi .
+vko:InferenceStep a owl:Class ; rdfs:label "Bước suy diễn"@vi .
 
-vko:Image a owl:Class ; rdfs:label "Ảnh"@vi .
-vko:BoundingBox a owl:Class ; rdfs:label "Khung bao"@vi .
-vko:TrafficRule a owl:Class ; rdfs:label "Quy tắc giao thông"@vi .
-vko:ProhibitionRule
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficRule ;
-    rdfs:label "Quy tắc cấm"@vi .
-vko:ObligationRule
-    a owl:Class ;
-    rdfs:subClassOf vko:TrafficRule ;
-    rdfs:label "Quy tắc bắt buộc"@vi .
-vko:Maneuver a owl:Class ; rdfs:label "Hành vi điều khiển"@vi .
-vko:Vehicle a owl:Class ; rdfs:label "Phương tiện"@vi .
-vko:ModelRun a owl:Class ; rdfs:label "Lần chạy mô hình"@vi .
-vko:DatasetAnnotation a owl:Class ; rdfs:label "Nhãn dữ liệu"@vi .
+vko:hasObject a owl:ObjectProperty ;
+    rdfs:domain vko:Problem ; rdfs:range vko:KnowledgeObject .
+vko:hasFact a owl:ObjectProperty ;
+    rdfs:domain vko:Problem ; rdfs:range vko:Fact .
+vko:hasGoal a owl:ObjectProperty ;
+    rdfs:domain vko:Problem ; rdfs:range vko:Goal .
+vko:appliedRule a owl:ObjectProperty ;
+    rdfs:domain vko:InferenceStep ; rdfs:range vko:KnowledgeRule .
+vko:usedPremise a owl:ObjectProperty ;
+    rdfs:domain vko:InferenceStep ; rdfs:range vko:Fact .
+vko:generatedConclusion a owl:ObjectProperty ;
+    rdfs:domain vko:InferenceStep ; rdfs:range vko:Fact .
+vko:hasInferenceStep a owl:ObjectProperty ;
+    rdfs:domain vko:InferenceRun ; rdfs:range vko:InferenceStep .
 
-vko:observesSignType
-    a owl:ObjectProperty ;
-    rdfs:domain vko:TrafficSignObservation ;
-    rdfs:range vko:TrafficSignType ;
-    rdfs:label "quan sát loại biển"@vi .
-
-vko:depictsSign
-    a owl:ObjectProperty ;
-    rdfs:domain vko:Image ;
-    rdfs:range vko:TrafficSignObservation ;
-    owl:inverseOf vko:inImage .
-
-vko:inImage
-    a owl:ObjectProperty ;
-    rdfs:domain vko:TrafficSignObservation ;
-    rdfs:range vko:Image .
-
-vko:hasBoundingBox
-    a owl:ObjectProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:TrafficSignObservation ;
-    rdfs:range vko:BoundingBox .
-
-vko:conveysRule
-    a owl:ObjectProperty ;
-    rdfs:domain
-        [ a owl:Class ;
-          owl:unionOf (vko:TrafficSignType vko:TrafficSignObservation)
-        ] ;
-    rdfs:range vko:TrafficRule .
-
-vko:appliesTo
-    a owl:ObjectProperty ;
-    rdfs:domain vko:TrafficRule ;
-    rdfs:range vko:Vehicle .
-
-vko:prohibitsManeuver
-    a owl:ObjectProperty ;
-    rdfs:subPropertyOf vko:governsManeuver ;
-    rdfs:domain vko:ProhibitionRule ;
-    rdfs:range vko:Maneuver .
-
-vko:requiresManeuver
-    a owl:ObjectProperty ;
-    rdfs:subPropertyOf vko:governsManeuver ;
-    rdfs:domain vko:ObligationRule ;
-    rdfs:range vko:Maneuver .
-
-vko:governsManeuver
-    a owl:ObjectProperty ;
-    rdfs:domain vko:TrafficRule ;
-    rdfs:range vko:Maneuver .
-
-vko:generatedBy
-    a owl:ObjectProperty ;
-    rdfs:domain vko:TrafficSignObservation ;
-    rdfs:range
-        [ a owl:Class ;
-          owl:unionOf (vko:ModelRun vko:DatasetAnnotation)
-        ] .
-
-vko:rawCode
-    a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:TrafficSignType ;
+vko:factKind a owl:DatatypeProperty ;
+    rdfs:domain vko:Fact ; rdfs:range xsd:string .
+vko:predicateName a owl:DatatypeProperty ;
+    rdfs:range xsd:string .
+vko:argumentValue a owl:DatatypeProperty ;
+    rdfs:domain vko:Fact ; rdfs:range xsd:string .
+vko:problemId a owl:DatatypeProperty ;
+    rdfs:domain vko:InferenceRun ; rdfs:range xsd:string .
+vko:reasoningStatus a owl:DatatypeProperty ;
+    rdfs:domain vko:InferenceRun ; rdfs:range xsd:string .
+vko:sequenceNumber a owl:DatatypeProperty ;
+    rdfs:domain vko:InferenceStep ; rdfs:range xsd:nonNegativeInteger .
+vko:implementationReference a owl:DatatypeProperty ;
+    rdfs:range xsd:string .
+vko:componentVersion a owl:DatatypeProperty ;
     rdfs:range xsd:string .
 
-vko:confidence
-    a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:range xsd:decimal .
+### Visual evidence and accepted entities ###################################
 
+vko:Image a owl:Class ;
+    rdfs:subClassOf vko:KnowledgeObject ;
+    rdfs:label "Ảnh"@vi .
+
+vko:ImageRegion a owl:Class ;
+    rdfs:subClassOf vko:KnowledgeObject ;
+    rdfs:label "Vùng ảnh"@vi .
+
+vko:TrafficSignOccurrence a owl:Class ;
+    rdfs:subClassOf vko:KnowledgeObject ;
+    rdfs:label "Biển báo cụ thể được quan sát"@vi .
+
+vko:EvidenceAssertion a owl:Class ;
+    rdfs:label "Khẳng định bằng chứng"@vi .
+vko:ClassificationAssertion a owl:Class ;
+    rdfs:subClassOf vko:EvidenceAssertion ;
+    rdfs:label "Khẳng định phân loại"@vi .
+
+vko:DatasetAnnotationRun a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Lần nhập annotation dataset"@vi .
+vko:ModelRun a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Lần chạy mô hình phát hiện"@vi .
+
+vko:hasRegion a owl:ObjectProperty ;
+    rdfs:domain vko:Image ; rdfs:range vko:ImageRegion ;
+    owl:inverseOf vko:regionOf .
+vko:regionOf a owl:ObjectProperty ;
+    rdfs:domain vko:ImageRegion ; rdfs:range vko:Image .
+vko:depicts a owl:ObjectProperty ;
+    rdfs:domain vko:ImageRegion ; rdfs:range vko:TrafficSignOccurrence .
+vko:assertionSubject a owl:ObjectProperty ;
+    rdfs:domain vko:EvidenceAssertion ; rdfs:range vko:KnowledgeObject .
+vko:generatedBy a owl:ObjectProperty ;
+    rdfs:domain vko:EvidenceAssertion ; rdfs:range prov:Activity ;
+    rdfs:subPropertyOf prov:wasGeneratedBy .
+
+vko:assertedType a owl:AnnotationProperty ;
+    rdfs:label "OWL class được assertion đề xuất"@vi .
+vko:assertionStatus a owl:ObjectProperty ;
+    rdfs:domain vko:EvidenceAssertion ; rdfs:range vko:AssertionStatus .
+vko:AssertionStatus a owl:Class .
+vko:Accepted a owl:NamedIndividual, vko:AssertionStatus .
+vko:PendingReview a owl:NamedIndividual, vko:AssertionStatus .
+vko:Rejected a owl:NamedIndividual, vko:AssertionStatus .
+vko:Quarantined a owl:NamedIndividual, vko:AssertionStatus .
+
+vko:confidence a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain vko:EvidenceAssertion ; rdfs:range xsd:decimal .
 vko:xMin a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:BoundingBox ; rdfs:range xsd:nonNegativeInteger .
+    rdfs:domain vko:ImageRegion ; rdfs:range xsd:nonNegativeInteger .
 vko:yMin a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:BoundingBox ; rdfs:range xsd:nonNegativeInteger .
+    rdfs:domain vko:ImageRegion ; rdfs:range xsd:nonNegativeInteger .
 vko:xMax a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:BoundingBox ; rdfs:range xsd:nonNegativeInteger .
+    rdfs:domain vko:ImageRegion ; rdfs:range xsd:nonNegativeInteger .
 vko:yMax a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain vko:BoundingBox ; rdfs:range xsd:nonNegativeInteger .
+    rdfs:domain vko:ImageRegion ; rdfs:range xsd:nonNegativeInteger .
+vko:imageWidth a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain vko:Image ; rdfs:range xsd:positiveInteger .
+vko:imageHeight a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain vko:Image ; rdfs:range xsd:positiveInteger .
+vko:sourcePath a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain vko:Image ; rdfs:range xsd:string .
+vko:contentHash a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string .
+vko:datasetId a owl:DatatypeProperty ; rdfs:range xsd:string .
+vko:datasetVersion a owl:DatatypeProperty ; rdfs:range xsd:string .
+
+### Traffic-sign concepts ####################################################
+
+vko:TrafficSign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSignOccurrence ;
+    rdfs:label "Biển báo giao thông"@vi .
+vko:ProhibitionSign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSign ; rdfs:label "Biển báo cấm"@vi .
+vko:WarningSign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSign ; rdfs:label "Biển cảnh báo"@vi .
+vko:MandatorySign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSign ; rdfs:label "Biển hiệu lệnh"@vi .
+vko:IndicationSign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSign ; rdfs:label "Biển chỉ dẫn"@vi .
+vko:SupplementarySign a owl:Class ;
+    rdfs:subClassOf vko:TrafficSign ; rdfs:label "Biển phụ"@vi .
+
+vko:TrafficRule a owl:Class ;
+    rdfs:subClassOf vko:KnowledgeObject ; rdfs:label "Quy tắc giao thông"@vi .
+vko:ProhibitionRule a owl:Class ;
+    rdfs:subClassOf vko:TrafficRule ; rdfs:label "Quy tắc cấm"@vi .
+vko:ObligationRule a owl:Class ;
+    rdfs:subClassOf vko:TrafficRule ; rdfs:label "Quy tắc bắt buộc"@vi .
+vko:InformationRule a owl:Class ;
+    rdfs:subClassOf vko:TrafficRule ; rdfs:label "Quy tắc chỉ dẫn"@vi .
+vko:WarningRule a owl:Class ;
+    rdfs:subClassOf vko:TrafficRule ; rdfs:label "Quy tắc cảnh báo"@vi .
+vko:NumericRestriction a owl:Class ;
+    rdfs:subClassOf vko:KnowledgeObject ; rdfs:label "Giới hạn định lượng"@vi .
+
+vko:Maneuver a owl:Class ; rdfs:label "Hành vi giao thông"@vi .
+vko:VehicleCategory a owl:Class ; rdfs:label "Nhóm phương tiện"@vi .
+vko:Unit a owl:Class ; rdfs:label "Đơn vị"@vi .
+
+vko:conveysRule a owl:ObjectProperty ;
+    rdfs:domain vko:TrafficSignOccurrence ; rdfs:range vko:TrafficRule .
+vko:governsManeuver a owl:ObjectProperty ;
+    rdfs:domain vko:TrafficRule ; rdfs:range vko:Maneuver .
+vko:prohibitsManeuver a owl:ObjectProperty ;
+    rdfs:subPropertyOf vko:governsManeuver ;
+    rdfs:domain vko:ProhibitionRule ; rdfs:range vko:Maneuver .
+vko:requiresManeuver a owl:ObjectProperty ;
+    rdfs:subPropertyOf vko:governsManeuver ;
+    rdfs:domain vko:ObligationRule ; rdfs:range vko:Maneuver .
+vko:prohibitsVehicleCategory a owl:ObjectProperty ;
+    rdfs:label "cấm nhóm phương tiện"@vi, "prohibits vehicle category"@en ;
+    rdfs:domain vko:ProhibitionRule ; rdfs:range vko:VehicleCategory .
+vko:appliesTo a owl:ObjectProperty ;
+    rdfs:domain vko:TrafficRule ; rdfs:range vko:VehicleCategory .
+vko:broaderVehicleCategory a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain vko:VehicleCategory ; rdfs:range vko:VehicleCategory .
+vko:hasUnit a owl:ObjectProperty ;
+    rdfs:domain vko:TrafficRule ; rdfs:range vko:Unit .
+vko:hasRestrictionValue a owl:DatatypeProperty ;
+    rdfs:domain vko:TrafficRule ; rdfs:range xsd:decimal .
+
+### Catalog metadata: annotations on OWL classes ############################
+
+vko:sourceClassId a owl:AnnotationProperty .
+vko:rawCode a owl:AnnotationProperty .
+vko:baseCode a owl:AnnotationProperty .
+vko:canonicalRule a owl:AnnotationProperty .
+vko:mappingStatus a owl:AnnotationProperty .
+vko:mappingNote a owl:AnnotationProperty .
+
+vko:Mapped a owl:NamedIndividual .
+vko:TaxonomyOnly a owl:NamedIndividual .
+vko:NeedsReview a owl:NamedIndividual .
+
+### Maneuver, vehicle and unit vocabulary ###################################
 
 vko:TurnLeft a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Rẽ trái"@vi .
 vko:TurnRight a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Rẽ phải"@vi .
 vko:GoStraight a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Đi thẳng"@vi .
 vko:UTurn a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Quay đầu"@vi .
+vko:EnterRoad a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Đi vào đường"@vi .
+vko:Stop a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Dừng xe"@vi .
+vko:Park a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Đỗ xe"@vi .
+vko:PassRight a owl:NamedIndividual, vko:Maneuver ; rdfs:label "Đi vòng bên phải"@vi .
 
-vko:Truck a owl:Class ; rdfs:subClassOf vko:Vehicle ; rdfs:label "Xe tải"@vi .
-vko:Motorcycle a owl:Class ; rdfs:subClassOf vko:Vehicle ; rdfs:label "Xe máy"@vi .
-vko:PassengerCar a owl:Class ; rdfs:subClassOf vko:Vehicle ; rdfs:label "Ô tô con"@vi .
+vko:Vehicle a owl:NamedIndividual, vko:VehicleCategory ; rdfs:label "Mọi phương tiện"@vi .
+vko:MotorVehicle a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:Vehicle ; rdfs:label "Xe cơ giới"@vi .
+vko:PassengerCar a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:MotorVehicle ; rdfs:label "Ô tô con"@vi .
+vko:Truck a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:MotorVehicle ; rdfs:label "Xe tải"@vi .
+vko:Bus a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:MotorVehicle ; rdfs:label "Ô tô khách"@vi .
+vko:Motorcycle a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:MotorVehicle ; rdfs:label "Mô tô, xe máy"@vi .
+vko:SemiTrailer a owl:NamedIndividual, vko:VehicleCategory ;
+    vko:broaderVehicleCategory vko:MotorVehicle ; rdfs:label "Xe sơ-mi rơ-moóc"@vi .
 
+vko:KilometrePerHour a owl:NamedIndividual, vko:Unit ; rdfs:label "km/h" .
+vko:Metre a owl:NamedIndividual, vko:Unit ; rdfs:label "m" .
+
+### Executable COKB component declarations #################################
+
+vko:RulesOf a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.rules_of" ;
+    vko:componentVersion "1.0.0" .
+vko:ProhibitedManeuvers a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.prohibited_maneuvers" ;
+    vko:componentVersion "1.0.0" .
+vko:RequiredManeuvers a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.required_maneuvers" ;
+    vko:componentVersion "1.0.0" .
+vko:ApplicableVehicles a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.applicable_vehicles" ;
+    vko:componentVersion "1.0.0" .
+vko:IsApplicableTo a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.is_applicable_to" ;
+    vko:componentVersion "1.0.0" .
+vko:ManeuverStatus a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.maneuver_status" ;
+    vko:componentVersion "1.0.0" .
+vko:RestrictionValue a vko:KnowledgeFunction ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.restriction_value" ;
+    vko:componentVersion "1.0.0" .
+vko:EvaluateManeuver a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.engine.CokbEngine.solve" ;
+    vko:componentVersion "1.0.0" .
+vko:InterpretSign a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.rules_of" ;
+    vko:componentVersion "1.0.0" .
+vko:ResolveCompositeSign a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.prohibited_maneuvers" ;
+    vko:componentVersion "1.0.0" .
+vko:EvaluateVehicleApplicability a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.domain.is_applicable_to" ;
+    vko:componentVersion "1.0.0" .
+vko:MaterializeKnowledge a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.engine.CokbEngine.solve" ;
+    vko:componentVersion "1.0.0" .
+vko:ExplainConclusion a vko:KnowledgeOperation ;
+    vko:implementationReference "traffic_sign_kg.cokb.explanation.explanation_payload" ;
+    vko:componentVersion "1.0.0" .
+
+vko:R_TAX_001 a vko:KnowledgeRule ; rdfs:label "Suy diễn phân cấp loại"@vi .
+vko:R_SIGN_001 a vko:KnowledgeRule ; rdfs:label "Gắn rule của lớp biển vào occurrence"@vi .
+vko:R_MAN_001 a vko:KnowledgeRule ; rdfs:label "Suy ra hành vi bị cấm"@vi .
+vko:R_MAN_002 a vko:KnowledgeRule ; rdfs:label "Suy ra hành vi bắt buộc"@vi .
+vko:R_VEH_001 a vko:KnowledgeRule ; rdfs:label "Suy ra đối tượng áp dụng"@vi .
+vko:R_VEH_TAX_001 a vko:KnowledgeRule ; rdfs:label "Lan truyền phân cấp phương tiện"@vi .
+vko:R_VEH_ACCESS_001 a vko:KnowledgeRule ; rdfs:label "Suy ra phương tiện bị cấm"@vi .
+vko:R_STATUS_001 a vko:KnowledgeRule ; rdfs:label "Kết luận hành vi bị cấm"@vi .
+vko:R_STATUS_002 a vko:KnowledgeRule ; rdfs:label "Kết luận hành vi bắt buộc"@vi .
+vko:R_NUM_001 a vko:KnowledgeRule ; rdfs:label "Suy ra giới hạn định lượng"@vi .

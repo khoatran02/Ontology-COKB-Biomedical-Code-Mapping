@@ -1,0 +1,6 @@
+PREFIX vko: <https://w3id.org/vn-ts-cokb/ontology#>
+
+SELECT ?sign ?rule
+FROM <https://w3id.org/vn-ts-cokb/graph/asserted>
+FROM <https://w3id.org/vn-ts-cokb/graph/inferred/current>
+WHERE { ?sign vko:conveysRule ?rule . }

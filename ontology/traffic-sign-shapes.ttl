@@ -1,60 +1,53 @@
-@prefix vko: <https://example.org/traffic-sign-kg/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vko: <https://w3id.org/vn-ts-cokb/ontology#> .
 
-vko:TrafficSignObservationShape
-    a sh:NodeShape ;
-    sh:targetClass vko:TrafficSignObservation ;
-    sh:property [
-        sh:path vko:observesSignType ;
-        sh:class vko:TrafficSignType ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:message "Observation phải liên kết đúng một loại biển báo."@vi
-    ] ;
-    sh:property [
-        sh:path vko:inImage ;
-        sh:class vko:Image ;
-        sh:minCount 1 ;
-        sh:maxCount 1
-    ] ;
-    sh:property [
-        sh:path vko:hasBoundingBox ;
-        sh:class vko:BoundingBox ;
-        sh:minCount 1 ;
-        sh:maxCount 1
-    ] ;
-    sh:property [
-        sh:path vko:generatedBy ;
-        sh:minCount 1 ;
-        sh:message "Observation phải có provenance."@vi
-    ] ;
-    sh:property [
-        sh:path vko:confidence ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0 ;
-        sh:maxInclusive 1 ;
-        sh:maxCount 1
-    ] .
+vko:ImageShape a sh:NodeShape ;
+    sh:targetClass vko:Image ;
+    sh:property [ sh:path vko:imageWidth ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minExclusive 0 ] ;
+    sh:property [ sh:path vko:imageHeight ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minExclusive 0 ] ;
+    sh:property [ sh:path vko:sourcePath ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path vko:contentHash ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:pattern "^sha256:[0-9a-f]{64}$" ] .
 
-vko:BoundingBoxShape
-    a sh:NodeShape ;
-    sh:targetClass vko:BoundingBox ;
-    sh:property [ sh:path vko:xMin ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
-    sh:property [ sh:path vko:yMin ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
-    sh:property [ sh:path vko:xMax ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
-    sh:property [ sh:path vko:yMax ; sh:datatype xsd:nonNegativeInteger ; sh:minCount 1 ; sh:maxCount 1 ] ;
+vko:RegionShape a sh:NodeShape ;
+    sh:targetClass vko:ImageRegion ;
+    sh:property [ sh:path vko:regionOf ; sh:minCount 1 ; sh:maxCount 1 ; sh:class vko:Image ] ;
+    sh:property [ sh:path vko:depicts ; sh:minCount 1 ; sh:maxCount 1 ; sh:class vko:TrafficSignOccurrence ] ;
+    sh:property [ sh:path vko:xMin ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ] ;
+    sh:property [ sh:path vko:yMin ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ] ;
+    sh:property [ sh:path vko:xMax ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minExclusive 0 ] ;
+    sh:property [ sh:path vko:yMax ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minExclusive 0 ] ;
     sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "Bounding box phải thỏa xMin < xMax và yMin < yMax."@vi ;
+        sh:message "Bounding box must be ordered and inside image dimensions."@en ;
         sh:select """
-            PREFIX vko: <https://example.org/traffic-sign-kg/ontology#>
-            SELECT $this
-            WHERE {
-                $this vko:xMin ?xMin ; vko:xMax ?xMax ;
-                      vko:yMin ?yMin ; vko:yMax ?yMax .
-                FILTER (?xMin >= ?xMax || ?yMin >= ?yMax)
+            SELECT $this WHERE {
+              $this vko:regionOf ?image ; vko:xMin ?x0 ; vko:yMin ?y0 ; vko:xMax ?x1 ; vko:yMax ?y1 .
+              ?image vko:imageWidth ?width ; vko:imageHeight ?height .
+              FILTER (?x0 >= ?x1 || ?y0 >= ?y1 || ?x1 > ?width || ?y1 > ?height)
             }
         """
     ] .
 
+vko:ClassificationAssertionShape a sh:NodeShape ;
+    sh:targetClass vko:ClassificationAssertion ;
+    sh:property [ sh:path vko:assertionSubject ; sh:minCount 1 ; sh:maxCount 1 ; sh:class vko:TrafficSignOccurrence ] ;
+    sh:property [ sh:path vko:assertedType ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path vko:generatedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path vko:assertionStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:in (vko:Accepted vko:PendingReview vko:Rejected vko:Quarantined) ] ;
+    sh:property [ sh:path vko:confidence ; sh:datatype xsd:decimal ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ; sh:maxInclusive 1 ] ;
+    sh:sparql [
+        sh:message "Accepted classification must materialize rdf:type on its sign occurrence."@en ;
+        sh:select """
+            SELECT $this WHERE {
+              $this vko:assertionStatus vko:Accepted ; vko:assertionSubject ?sign ; vko:assertedType ?class .
+              FILTER NOT EXISTS { ?sign rdf:type ?class }
+            }
+        """
+    ] .
+
+vko:CatalogClassShape a sh:NodeShape ;
+    sh:targetSubjectsOf vko:sourceClassId ;
+    sh:property [ sh:path vko:sourceClassId ; sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ; sh:maxInclusive 51 ] ;
+    sh:property [ sh:path vko:rawCode ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path vko:mappingStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:in (vko:Mapped vko:TaxonomyOnly vko:NeedsReview) ] .

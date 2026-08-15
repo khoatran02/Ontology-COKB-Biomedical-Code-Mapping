@@ -1,0 +1,17 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vko: <https://w3id.org/vn-ts-cokb/ontology#> .
+@prefix ex: <https://w3id.org/vn-ts-cokb/resource/fixture/> .
+
+ex:image-1 a vko:Image ; vko:hasRegion ex:region-1 ;
+    vko:imageWidth 640 ; vko:imageHeight 480 ;
+    vko:sourcePath "fixtures/image-1.jpg" ;
+    vko:contentHash "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+ex:region-1 a vko:ImageRegion ; vko:regionOf ex:image-1 ; vko:depicts ex:sign-1 ;
+    vko:xMin 10 ; vko:yMin 20 ; vko:xMax 110 ; vko:yMax 120 .
+ex:sign-1 a vko:TrafficSignOccurrence, vko:NoRightTurnSign .
+ex:assertion-1 a vko:ClassificationAssertion ;
+    vko:assertionSubject ex:sign-1 ; vko:assertedType vko:NoRightTurnSign ;
+    vko:generatedBy ex:dataset-run-1 ; vko:assertionStatus vko:Accepted ;
+    vko:confidence "1.0"^^xsd:decimal .
+ex:dataset-run-1 a vko:DatasetAnnotationRun .

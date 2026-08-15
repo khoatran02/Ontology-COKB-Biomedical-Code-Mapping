@@ -1,18 +1,37 @@
 # Ontology-Grounded Traffic Sign Knowledge Graph
 
-Backend foundation for representing, validating, reasoning over, and hybrid-retrieving
-Vietnamese traffic signs.
+Đồ án biểu diễn và suy luận tri thức biển báo giao thông Việt Nam theo hướng
+COKB, được grounding bằng OWL/RDF và kiểm chứng bằng SHACL.
 
-Storage architecture:
+MVP dùng annotation YOLO có sẵn làm bằng chứng. Nó không cần detection model
+hay vector database để chạy ba bài toán suy luận cốt lõi. Trong hệ thống thực
+tế, detector chỉ bổ sung candidate observations; Qdrant chỉ là projection tìm
+kiếm tùy chọn và không phải nguồn chân lý ngữ nghĩa.
 
-- Apache Jena Fuseki/TDB2 is the RDF/OWL source of truth.
-- FAISS is a derived vector index.
-- SQLite stores jobs, `faiss_id ↔ rdf_uri` mappings, and index manifests.
-- The file system stores images/crops. The base source does not ingest datasets yet.
+## Những gì đã chạy được
 
-## Run locally
+- COKB runtime với `(C,H,R,Ops,Funcs,Rules)`, 12 `FactKind`, forward chaining,
+  goal heuristic, conflict detection và proof trace.
+- OWL ontology cho visual evidence, sign occurrence, sign taxonomy, traffic
+  rules, vehicle categories, problems và inference runs.
+- Semantic catalog đủ 52 class IDs, gồm mapping status và OWL `hasValue`
+  restrictions cho các lớp có meaning đã mô hình hóa.
+- Ba problem types: `InterpretSign`, `EvaluateManeuver`,
+  `EffectiveRestriction`.
+- YOLO annotation adapter cho 3.216 ảnh / 8.334 boxes, không gọi model.
+- RDF mapper tách `Image`, `ImageRegion`, `TrafficSignOccurrence` và
+  `ClassificationAssertion`.
+- SHACL validation với `ont_graph`, gold/invalid fixtures và luồng
+  accepted/review/quarantine.
+- Named-graph SPARQL queries và loader ontology/catalog cho Fuseki.
+- FastAPI semantic endpoints và regression tests.
 
-Requires Python 3.11–3.13. Example with `uv`:
+Trạng thái chi tiết: [docs/implement_state.md](docs/implement_state.md).
+Kế hoạch chuẩn: [docs/cokb-implementation-plan.md](docs/cokb-implementation-plan.md).
+
+## Chạy local
+
+Yêu cầu Python 3.11–3.13:
 
 ```bash
 uv venv --python 3.12
@@ -21,68 +40,58 @@ cp .env.example .env
 uv run traffic-sign-kg
 ```
 
-Open:
+API docs: `http://localhost:8000/docs`.
 
-```text
-http://localhost:8000/docs
-http://localhost:8000/api/v1/health/live
-http://localhost:8000/api/v1/health/ready
+Ví dụ kết luận biển P.123b cấm ô tô con rẽ phải:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/problems/evaluate-maneuver \
+  -H 'content-type: application/json' \
+  -d '{"class_id":32,"vehicle":"PassengerCar","maneuver":"TurnRight"}'
 ```
 
-Start Fuseki:
+Giới hạn tốc độ P.127*50:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/problems/effective-restriction \
+  -H 'content-type: application/json' \
+  -d '{"class_id":38}'
+```
+
+Kiểm tra profile và sample annotation:
+
+```bash
+curl http://localhost:8000/api/v1/ingestions/profile
+curl -X POST 'http://localhost:8000/api/v1/ingestions/validate-sample?limit=5'
+```
+
+## Fuseki / RDF graph database
 
 ```bash
 docker compose -f deployment/compose.yaml up -d fuseki
+PYTHONPATH=src .venv/bin/python scripts/load_named_graphs.py
 ```
 
-Load the base ontology:
+Loader nạp ontology và catalog vào hai named graphs riêng. Asserted, inferred,
+review và quarantine graphs sẽ được ghi bởi ingestion/materialization pipeline ở
+phase tiếp theo; query templates không phụ thuộc default-union graph.
+
+## Kiểm thử
 
 ```bash
-./scripts/load_ontology.sh
+.venv/bin/ruff check src tests scripts
+.venv/bin/pytest
 ```
 
-## Smoke test without dataset/model
+## Semantic contract quan trọng
 
-The development profile includes `DeterministicEmbeddingProvider`. This provider only
-builds stable vectors from text so you can exercise the pipeline; it must not be used
-as research results.
-
-```bash
-curl -X POST http://localhost:8000/api/v1/vector-indexes/ontology-concepts/rebuild \
-  -H 'content-type: application/json' \
-  -d '{
-    "dimension": 64,
-    "model_id": "deterministic-dev",
-    "model_revision": "v1",
-    "items": [
-      {
-        "rdf_uri": "https://example.org/traffic-sign-kg/ontology#ProhibitionSign",
-        "entity_type": "ontology_class",
-        "text": "biển báo cấm"
-      }
-    ]
-  }'
+```text
+Image --hasRegion--> ImageRegion --depicts--> TrafficSignOccurrence
+ClassificationAssertion --assertionSubject--> TrafficSignOccurrence
+ClassificationAssertion --assertedType--> OWL Sign Class
+TrafficSignOccurrence --rdf:type--> OWL Sign Class   (chỉ khi Accepted)
+TrafficSignOccurrence --conveysRule--> TrafficRule   (suy ra)
+TrafficRule --prohibits/requires--> Maneuver
 ```
 
-Then:
-
-```bash
-curl -X POST http://localhost:8000/api/v1/search/vector \
-  -H 'content-type: application/json' \
-  -d '{
-    "index_name": "ontology-concepts",
-    "text": "biển cấm",
-    "candidate_limit": 10
-  }'
-```
-
-## Real dataset and model
-
-Dataset adapters, YOLO parsing, crop generation, and pretrained embedding models are
-left for a later phase. Adapters must produce stable RDF URIs and `VectorBuildItem`
-records; they must not write ontology facts directly into FAISS.
-
-Detailed docs:
-
-- [Architecture](docs/architecture.md)
-- [Proposal](docs/Ontology-Grounded-Traffic-Sign-Knowledge-Graph-Proposal.md)
+Không tìm thấy luật cấm dẫn đến `UNKNOWN`, không tự suy ra `PERMITTED`.

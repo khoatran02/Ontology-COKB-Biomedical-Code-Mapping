@@ -1,0 +1,10 @@
+PREFIX vko: <https://w3id.org/vn-ts-cokb/ontology#>
+
+SELECT ?assertion ?sign ?class
+FROM <https://w3id.org/vn-ts-cokb/graph/review>
+WHERE {
+  ?assertion a vko:ClassificationAssertion ;
+             vko:assertionStatus vko:PendingReview ;
+             vko:assertionSubject ?sign ;
+             vko:assertedType ?class .
+}

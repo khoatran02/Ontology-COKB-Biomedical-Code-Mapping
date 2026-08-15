@@ -1,0 +1,9 @@
+PREFIX vko: <https://w3id.org/vn-ts-cokb/ontology#>
+
+SELECT ?sign ?value ?unit
+FROM <https://w3id.org/vn-ts-cokb/graph/catalog>
+FROM <https://w3id.org/vn-ts-cokb/graph/inferred/current>
+WHERE {
+  ?sign vko:conveysRule ?rule .
+  ?rule vko:hasRestrictionValue ?value ; vko:hasUnit ?unit .
+}

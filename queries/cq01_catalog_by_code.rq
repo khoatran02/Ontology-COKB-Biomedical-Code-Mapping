@@ -1,0 +1,12 @@
+PREFIX vko: <https://w3id.org/vn-ts-cokb/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?class ?label ?family ?status
+FROM <https://w3id.org/vn-ts-cokb/graph/catalog>
+WHERE {
+  ?class vko:rawCode "P.123b" ;
+         rdfs:subClassOf ?family ;
+         vko:mappingStatus ?status ;
+         rdfs:label ?label .
+  FILTER(isIRI(?family) && lang(?label) = "vi")
+}

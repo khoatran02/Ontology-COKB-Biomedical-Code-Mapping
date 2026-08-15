@@ -4,6 +4,12 @@
 
 ## Biểu diễn, kiểm chứng và suy luận ngữ nghĩa biển báo giao thông Việt Nam từ dữ liệu thị giác
 
+> **Ghi chú triển khai:** Đây là đề cương nghiên cứu ban đầu. Kiến trúc triển khai
+> chuẩn hiện tại được quy định trong [Kế hoạch triển khai COKB](./cokb-implementation-plan.md).
+> Khi hai tài liệu khác nhau về semantic contract, reasoning hoặc vector database,
+> ưu tiên tài liệu triển khai COKB. Qdrant chỉ là vector database tùy chọn;
+> FAISS legacy đã được loại khỏi semantic MVP.
+
 **Lĩnh vực:** Biểu diễn tri thức, Ontology Engineering, Knowledge Graph, Computer Vision
 
 **Phiên bản đề cương:** 1.0
@@ -18,11 +24,11 @@
 
 Các hệ thống nhận diện biển báo giao thông thông thường chủ yếu trả về nhãn lớp, bounding box và confidence. Dạng output này phù hợp cho bài toán Computer Vision nhưng chưa biểu diễn đầy đủ ngữ nghĩa của biển báo: biển thuộc nhóm nào, truyền đạt quy định gì, áp dụng cho phương tiện nào, cấm hoặc yêu cầu thao tác nào, chứa tham số định lượng nào, được trích xuất bởi model nào và kết luận nào có thể được suy ra từ kết quả nhận diện.
 
-Đồ án đề xuất xây dựng **Ontology-Grounded Traffic Sign Knowledge Graph**, một hệ thống chuyển dữ liệu thị giác về biển báo giao thông Việt Nam thành tri thức RDF có ngữ nghĩa được định nghĩa bằng Ontology OWL. Hệ thống sử dụng bounding box có sẵn hoặc kết quả từ mô hình Open-Vocabulary Object Detection (OVOD), kết hợp Vision-Language Model (VLM) để nhận dạng và mô tả biển báo. Output của model không được ghi trực tiếp vào graph database mà phải đi qua schema trung gian, chuẩn hóa thuật ngữ, entity linking, RDF mapping, kiểm tra SHACL và policy kiểm soát confidence.
+Đồ án đề xuất xây dựng **Ontology-Grounded Traffic Sign Knowledge Graph**, một hệ thống chuyển dữ liệu thị giác về biển báo giao thông Việt Nam thành tri thức RDF có ngữ nghĩa được định nghĩa bằng Ontology OWL. Hệ thống sử dụng bounding box và class annotation có sẵn; pretrained detector hoặc Open-Vocabulary Object Detection (OVOD) chỉ là nguồn phát hiện tùy chọn cho ảnh mới. Output của model không được ghi trực tiếp vào graph database mà phải đi qua schema trung gian, chuẩn hóa thuật ngữ, entity linking, RDF mapping, kiểm tra SHACL và policy kiểm soát confidence.
 
 Ontology đóng vai trò là hợp đồng ngữ nghĩa trung tâm. Nó định nghĩa các lớp như `TrafficSign`, `ProhibitionSign`, `WarningSign`, `Vehicle`, `TrafficManeuver`, `TrafficRule`; các thuộc tính như `conveysRule`, `appliesTo`, `prohibitsManeuver`, `hasLimitValue`; cùng các tiên đề cho phép suy luận phân cấp, suy luận quan hệ và phân loại quy định. RDF triple store lưu assertion trực tiếp, assertion suy luận và provenance trong các named graph riêng. Người dùng truy vấn bằng SPARQL và nhận được kết quả kèm ảnh, bounding box, confidence, nguồn model và đường giải thích.
 
-Dataset hiện có gồm **3.216 ảnh**, **3.216 file nhãn YOLO**, **52 lớp** và **8.334 bounding boxes**. Dataset được dùng theo hai nhánh: nhánh chính dùng annotation gốc làm ground truth để đánh giá biểu diễn và suy luận tri thức; nhánh phụ sử dụng pretrained OVOD/VLM để minh họa pipeline thị giác end-to-end. Việc huấn luyện hoặc fine-tune model không phải yêu cầu bắt buộc.
+Dataset hiện có gồm **3.216 ảnh**, **3.216 file nhãn YOLO**, **52 lớp** và **8.334 bounding boxes**. Dataset được dùng theo hai nhánh: nhánh chính dùng annotation gốc làm ground truth để đánh giá biểu diễn và suy luận tri thức; nhánh phụ có thể sử dụng pretrained detector/OVOD để minh họa phát hiện trên ảnh mới. Việc huấn luyện hoặc fine-tune model không phải yêu cầu bắt buộc.
 
 Kết quả kỳ vọng là một Ontology OWL nhất quán, một Knowledge Graph có provenance, bộ SHACL shapes, tập rule suy luận, SPARQL competency queries, pipeline chuyển dữ liệu thị giác sang RDF và giao diện demo giải thích được kết luận. Trọng tâm của đồ án là **biểu diễn, kiểm chứng và suy luận tri thức**, không phải tối ưu mô hình nhận diện hoặc xây dựng chatbot RAG.
 
@@ -55,7 +61,7 @@ Output này chưa trả lời trực tiếp được các câu hỏi:
 - Quy định áp dụng cho loại đối tượng giao thông nào?
 - `P.124d` và `P.123b` có điểm chung gì?
 - Những biển nào đều cấm rẽ phải dù class ID khác nhau?
-- Kết luận do annotation gốc, OVOD hay VLM tạo ra?
+- Kết luận bắt nguồn từ annotation hay detection model?
 - Kết luận nào là dữ kiện trực tiếp và kết luận nào do reasoner suy ra?
 
 Danh sách class không cung cấp một cơ chế chính thức để trả lời các câu hỏi này.
@@ -148,7 +154,7 @@ flowchart LR
 
 ### 2.1. Bài toán tổng quát
 
-Cho tập ảnh giao thông I, tập bounding box hoặc detection D, tập class nguồn C, kết quả mô tả từ VLM V, và Ontology O, xây dựng Knowledge Graph G sao cho:
+Cho tập ảnh giao thông `I`, tập bounding box hoặc detection `D`, tập class nguồn `C` và Ontology `O`, xây dựng Knowledge Graph `G` sao cho:
 
 1. Mỗi ảnh, vùng ảnh, biển báo, assertion và model run có định danh ổn định.
 2. Mỗi class nguồn được ánh xạ sang biểu diễn ngữ nghĩa trong ontology.
@@ -165,7 +171,7 @@ G = Reason(
       Validate(
         MapToRDF(
           Normalize(
-            Align(D, V)
+            Align(D, C)
           ),
           O
         )
@@ -181,7 +187,7 @@ G = Reason(
 Đồ án giải quyết bốn vấn đề:
 
 1. **Biểu diễn:** Làm thế nào biểu diễn biển báo, vùng ảnh, ý nghĩa quy định, đối tượng áp dụng và tham số dưới dạng OWL/RDF?
-2. **Tích hợp:** Làm thế nào hợp nhất annotation, OVOD và VLM mà vẫn giữ provenance?
+2. **Tích hợp:** Làm thế nào hợp nhất annotation và detection tùy chọn mà vẫn giữ provenance?
 3. **Kiểm chứng:** Làm thế nào ngăn output thiếu hoặc không hợp lệ đi vào graph?
 4. **Suy luận:** Làm thế nào suy ra tri thức bậc cao và giải thích kết quả từ các fact trực tiếp?
 
@@ -203,7 +209,7 @@ Làm thế nào phân rã các class ghép như `P.127*50`, `P.106a*Xe tải` ho
 
 ### RQ3 — Provenance-aware integration
 
-Làm thế nào tích hợp annotation gốc, OVOD và VLM vào cùng Knowledge Graph nhưng vẫn phân biệt nguồn, model run, confidence và raw output?
+Làm thế nào tích hợp annotation gốc và detection model tùy chọn vào cùng Knowledge Graph nhưng vẫn phân biệt nguồn, model run, confidence và raw output?
 
 ### RQ4 — Validation
 
@@ -237,7 +243,7 @@ Xây dựng và đánh giá một hệ thống Knowledge Graph có Ontology OWL 
 
 1. Phân tích và chuẩn hóa catalog 52 lớp.
 2. Xây dựng Ontology OWL theo module.
-3. Xây dựng schema trung gian cho annotation, OVOD và VLM.
+3. Xây dựng schema trung gian cho annotation và detection output tùy chọn.
 4. Thiết kế URI deterministic cho các resource.
 5. Chuyển annotation và model output thành RDF.
 6. Lưu provenance cho từng assertion.
@@ -274,7 +280,7 @@ Xây dựng và đánh giá một hệ thống Knowledge Graph có Ontology OWL 
 - 52 class ID hiện có trong dataset.
 - Bounding box theo định dạng YOLO.
 - Ngữ nghĩa biển báo ở mức class, nhóm, quy định, đối tượng, thao tác và tham số.
-- Annotation gốc, pretrained OVOD và pretrained VLM.
+- Annotation gốc và pretrained detector/OVOD tùy chọn.
 - RDF, RDFS, OWL 2 RL, SHACL và SPARQL.
 - Provenance ở mức model, model run, image, region và assertion.
 - Truy vấn có giải thích.
@@ -290,20 +296,20 @@ Xây dựng và đánh giá một hệ thống Knowledge Graph có Ontology OWL 
 - Dựng bản đồ HD.
 - Temporal reasoning cho video.
 - Huấn luyện detector state-of-the-art.
-- Fine-tune VLM lớn.
+- Xây dựng mô hình sinh ngôn ngữ hoặc giao diện hỏi đáp sinh tự do.
 - Xây dựng chatbot trả lời từ kiến thức ngoài graph.
 
 
 
 ### 5.3. Ranh giới với Computer Vision và RAG
 
-Đồ án không đánh giá thành công chỉ bằng mAP hoặc độ chính xác VLM. Detector và VLM là nguồn bằng chứng. Thành phần trung tâm là:
+Đồ án không đánh giá thành công chỉ bằng mAP của detector. Detection output chỉ là nguồn bằng chứng tùy chọn. Thành phần trung tâm là:
 
 ```text
 Ontology → RDF mapping → SHACL → Reasoning → SPARQL → Explanation
 ```
 
-Hệ thống phải tiếp tục trả lời competency questions trên graph khi tắt VLM và mọi thành phần RAG.
+Hệ thống phải tiếp tục trả lời competency questions trên graph khi tắt detection model, vector retrieval và mọi thành phần RAG.
 
 ---
 
@@ -578,7 +584,7 @@ Ground truth ngữ nghĩa cần được tạo cho toàn bộ 52 class ở mức
 | FR-02 | Chuyển bbox normalized sang pixel và tạo Region URI |
 | FR-03 | Đọc class catalog ba ngôn ngữ/mã                    |
 | FR-04 | Chạy pretrained OVOD ở chế độ tùy chọn              |
-| FR-05 | Crop region và gọi pretrained VLM ở chế độ tùy chọn |
+| FR-05 | Nhận detection output theo schema ở chế độ tùy chọn |
 | FR-06 | Parse output vào schema trung gian                  |
 | FR-07 | Chuẩn hóa label và entity linking sang ontology URI |
 | FR-08 | Tạo RDF assertion kèm provenance                    |
@@ -608,7 +614,7 @@ Ground truth ngữ nghĩa cần được tạo cho toàn bộ 52 class ở mức
 | NFR-07 | Ontology parse được bằng công cụ chuẩn     |
 | NFR-08 | Query có regression test                   |
 | NFR-09 | Không yêu cầu fine-tune để hoàn thành MVP  |
-| NFR-10 | Không dùng VLM như nguồn chân lý cuối cùng |
+| NFR-10 | Không dùng detection model như nguồn chân lý cuối cùng |
 
 
 ---
@@ -632,7 +638,6 @@ flowchart TD
     subgraph PERCEPTION["2. Perception layer"]
         GT["Ground-truth adapter"]
         OVOD["Pretrained OVOD<br/>generic traffic-sign detection"]
-        VLM["Pretrained VLM<br/>classification và semantics"]
     end
 
     subgraph SEMANTIC["3. Semantic integration"]
@@ -672,10 +677,8 @@ flowchart TD
     IMG --> GT
     YOLO --> GT
     IMG -.-> OVOD
-    IMG -.-> VLM
     GT --> SCHEMA
     OVOD --> SCHEMA
-    VLM --> SCHEMA
     CAT --> LINK
     SCHEMA --> ALIGN --> LINK --> URI --> MAP
     ONT --> MAP
@@ -705,7 +708,7 @@ flowchart TD
 4. Validation diễn ra trước materialization.
 5. Reasoning chạy trên asserted graph đã được chấp nhận.
 6. Inferred graph có thể xóa và tái tạo.
-7. Giao diện truy vấn đọc Knowledge Graph, không hỏi VLM trực tiếp.
+7. Giao diện truy vấn đọc Knowledge Graph và inference trace, không hỏi model thị giác trực tiếp.
 
 ---
 
@@ -737,8 +740,8 @@ YOLO annotation gốc
 Ảnh
 → pretrained OVOD phát hiện vùng traffic sign
 → crop
-→ pretrained VLM nhận dạng mã/ý nghĩa
-→ mapping
+→ model trả candidate class nếu có
+→ catalog mapping hoặc curator review
 → Knowledge Graph
 ```
 
@@ -754,21 +757,15 @@ Pretrained OVOD phù hợp để:
 
 - Phát hiện vùng chứa biển báo giao thông.
 - Cho phép prompt theo nhóm như `traffic sign`, `speed limit sign`.
-- Tạo proposal region cho VLM.
+- Tạo proposal region cho bước mapping hoặc curator review.
 
 OVOD có thể không phân biệt chính xác 52 mã biển Việt Nam. Do đó không ép OVOD giải quyết toàn bộ fine-grained classification.
 
-### 10.3. Vai trò của VLM
+### 10.3. Không sử dụng mô hình thị giác–ngôn ngữ
 
-VLM được dùng để:
+Project không tích hợp mô hình thị giác–ngôn ngữ. Mã biển, maneuver, target vehicle và numeric parameter được lấy từ semantic catalog đã review. Với ảnh mới, detector chỉ tạo bounding box và candidate class; candidate không khớp catalog được chuyển cho curator thay vì gọi mô hình sinh ngôn ngữ.
 
-- Đọc ký hiệu hoặc con số trong crop.
-- Chọn canonical class từ candidate list.
-- Trích xuất parameter.
-- Sinh attribute hoặc semantic assertion có cấu trúc.
-- Đối chiếu detection với catalog.
-
-VLM phải trả JSON theo schema. Không lưu chain-of-thought hoặc đoạn suy diễn tự do vào graph.
+Explanation được tạo từ inference trace có cấu trúc, không được sinh bởi mô hình ngôn ngữ.
 
 ### 10.4. Vai trò của annotation gốc
 
@@ -790,11 +787,10 @@ flowchart LR
     MODE -->|"B: end-to-end"| OVOD["Pretrained OVOD"]
     MODE -.->|"C: tùy chọn"| FT["Fine-tuned detector"]
 
-    OVOD --> CROP["Crop biển báo"]
+    OVOD --> CROP["Crop và candidate class"]
     FT --> CROP
-    CROP --> VLM["Pretrained VLM"]
     GT --> NORMAL["Normalized observation"]
-    VLM --> NORMAL
+    CROP --> NORMAL
 
     NORMAL --> ONTO["Ontology mapping"]
     ONTO --> KG["Validated Knowledge Graph"]
@@ -859,8 +855,7 @@ Observation Module
 ├── Assertion
 ├── ClassificationAssertion
 ├── RelationAssertion
-├── Detection
-└── VLMObservation
+└── Detection
 
 Provenance Module
 ├── Model
@@ -1224,10 +1219,10 @@ normative_source
 
 ```json
 {
-  "model_run_id": "vlm_run_2026_001",
-  "model_name": "pretrained-vlm",
+  "model_run_id": "detector_run_2026_001",
+  "model_name": "pretrained-detector",
   "model_version": "model-revision",
-  "prompt_hash": "...",
+  "config_hash": "...",
   "parameters": {
     "temperature": 0.0
   },
@@ -1256,10 +1251,8 @@ flowchart TD
     CATALOG --> LINK["Entity linking"]
     OBS --> LINK
 
-    IMG["Ảnh/crop"] -.-> OVOD["Optional pretrained OVOD"]
-    IMG -.-> VLM["Optional pretrained VLM"]
+    IMG["Ảnh/crop"] -.-> OVOD["Optional pretrained detector/OVOD"]
     OVOD -.-> ALIGN["Align với observation bằng IoU"]
-    VLM -.-> ALIGN
     ALIGN -.-> LINK
 
     LINK --> RDF["RDF mapper"]
@@ -1290,7 +1283,7 @@ vkr:image/0001
 vkr:region/0001/01
 vkr:sign/0001/01
 vkr:assertion/dataset/0001/01/classification
-vkr:model-run/vlm-run-2026-001
+vkr:model-run/detector-run-2026-001
 vkr:rule-instance/0001/01/prohibition-01
 ```
 
@@ -1306,7 +1299,7 @@ URI phải:
 
 ### 14.2. Object alignment
 
-Khi so sánh gold, OVOD và VLM:
+Khi so sánh gold và output của detector/OVOD:
 
 1. Cùng image ID.
 2. Tính IoU giữa bbox.
@@ -1371,7 +1364,7 @@ raw code/label
 - Có model.
 - Có thời gian chạy.
 - Có model version hoặc revision.
-- Có prompt/config fingerprint khi dùng VLM.
+- Có model configuration fingerprint.
 
 
 
@@ -1600,7 +1593,7 @@ Nhờ đó explanation service có thể tái dựng đường suy luận.
 | ID    | Câu hỏi                                                      |
 | ----- | ------------------------------------------------------------ |
 | CQ-16 | Assertion nào lấy từ annotation gốc?                         |
-| CQ-17 | Assertion nào do VLM tạo và chưa được detector hỗ trợ?       |
+| CQ-17 | Assertion nào do detector tạo và chưa được curator xác nhận? |
 | CQ-18 | Detection nào có confidence thấp hơn ngưỡng?                 |
 | CQ-19 | Record nào không qua SHACL và vì sao?                        |
 | CQ-20 | Assertion nào có hai model đưa ra classification cạnh tranh? |
@@ -1700,7 +1693,6 @@ sequenceDiagram
     participant QS as SPARQL Service
     participant TS as RDF Triple Store
     participant EX as Explanation Service
-    participant VLM as VLM tùy chọn
 
     U->>UI: Chọn competency question và tham số
     UI->>QS: Query ID + validated parameters
@@ -1710,12 +1702,7 @@ sequenceDiagram
     EX->>TS: Truy vấn premise, rule, provenance, region
     TS-->>EX: Evidence subgraph
     EX-->>UI: Conclusion + proof path + image + bbox
-    UI-->>U: Hiển thị graph và bằng chứng
-
-    opt Diễn đạt tự nhiên
-        UI->>VLM: Chỉ gửi result/evidence từ graph
-        VLM-->>UI: Câu diễn đạt không bổ sung fact
-    end
+    UI-->>U: Hiển thị graph, bằng chứng và diễn giải từ rule template
 ```
 
 
@@ -1835,7 +1822,7 @@ User intent
 → result và explanation
 ```
 
-VLM không được dùng để trả lời trực tiếp. Nếu có natural-language interface, VLM hoặc intent parser chỉ được ánh xạ câu hỏi vào query template đã được duyệt.
+Nếu có natural-language interface, intent parser xác định trước chỉ được ánh xạ câu hỏi vào query template đã được duyệt. Không sử dụng mô hình sinh ngôn ngữ để tạo câu trả lời.
 
 ### 20.4. Các loại câu hỏi người dùng
 
@@ -1870,7 +1857,7 @@ VLM không được dùng để trả lời trực tiếp. Nếu có natural-lan
 
 #### Tra cứu provenance và chất lượng
 
-- Assertion này đến từ annotation, OVOD hay VLM?
+- Assertion này đến từ annotation hay detection model?
 - Model run nào tạo prediction này?
 - Prediction nào có confidence dưới 0,5?
 - Assertion nào được nhiều nguồn hỗ trợ?
@@ -2057,10 +2044,8 @@ Luồng này dành cho admin hoặc demo end-to-end:
 ```mermaid
 flowchart TD
     U["Upload ảnh"] --> META["Tạo image ID và metadata"]
-    META --> OVOD["OVOD phát hiện traffic-sign regions"]
-    OVOD --> CROP["Tạo crop"]
-    CROP --> VLM["VLM nhận dạng code/semantics"]
-    VLM --> JSON["Structured observation JSON"]
+    META --> OVOD["Detector/OVOD tạo region và candidate class"]
+    OVOD --> JSON["Structured detection JSON"]
     JSON --> LINK["Entity linking"]
     LINK --> RDF["Candidate RDF graph"]
     RDF --> SHACL{"SHACL conformant?"}
@@ -2168,7 +2153,7 @@ Tùy chọn:
 - Upload ảnh mới.
 - SPARQL console.
 - Curator workflow đầy đủ.
-- VLM diễn đạt câu trả lời.
+- Export explanation theo template có cấu trúc.
 
 Natural-language query không nên là điều kiện hoàn thành. Query template giúp chứng minh rõ ontology và SPARQL mà không đưa thêm sai số từ NL-to-SPARQL.
 
@@ -2183,7 +2168,7 @@ Natural-language query không nên là điều kiện hoàn thành. Query templa
 | UF-05 | Prediction hiển thị source và confidence |
 | UF-06 | Inferred fact có rule và premises |
 | UF-07 | Record lỗi không xuất hiện như fact đã chấp nhận |
-| UF-08 | Tắt VLM vẫn dùng được Semantic Search và Explanation |
+| UF-08 | Tắt detection model vẫn dùng được Semantic Search và Explanation |
 
 ---
 
@@ -2263,7 +2248,7 @@ So sánh:
 
 ```text
 Gold annotation → Knowledge Graph
-Pretrained OVOD/VLM → Knowledge Graph
+Pretrained detector/OVOD → Knowledge Graph
 ```
 
 Đo:
@@ -2415,7 +2400,6 @@ Neo4j không nên là kho duy nhất vì đề tài cần OWL/RDF/SPARQL.
 ### 23.4. Perception
 
 - Một pretrained OVOD qua adapter.
-- Một pretrained VLM có structured output.
 - Không khóa schema hoặc ontology vào một model cụ thể.
 
 
@@ -2507,7 +2491,7 @@ flowchart LR
     P4 --> P5["GĐ5<br/>Dataset adapter + RDF mapper"]
     P5 --> P6["GĐ6<br/>Reasoning + explanation"]
     P6 --> P7["GĐ7<br/>Triple store + Query API"]
-    P7 --> P8["GĐ8<br/>Pretrained OVOD/VLM"]
+    P7 --> P8["GĐ8<br/>Pretrained detector/OVOD"]
     P8 --> P9["GĐ9<br/>Evaluation + report"]
 
     M1["Mốc A<br/>Ontology trả lời CQ<br/>trên RDF thủ công"]:::milestone
@@ -2666,7 +2650,7 @@ Dataset annotation phải đi qua validation, mapping và reasoning thành công
 
 - OVOD adapter.
 - Crop pipeline.
-- VLM structured prompt.
+- Detection output adapter và JSON Schema.
 - Object alignment.
 - Cache output.
 - So sánh predicted graph với gold graph.
@@ -2700,9 +2684,9 @@ Demo end-to-end trả về kết quả graph và explanation.
 | Scope ontology quá lớn                   | Chậm tiến độ             | Giới hạn 52 lớp và CQ                           |
 | Mất cân bằng class                       | Model bias               | Không bắt buộc train; báo cáo per-class         |
 | Frame gần giống bị chia sang nhiều split | Leakage                  | Group split theo sequence/location              |
-| OVOD không phân biệt mã chi tiết         | End-to-end accuracy thấp | Detect generic sign rồi dùng crop + VLM         |
-| VLM sinh JSON lỗi                        | Ingestion thất bại       | JSON Schema, retry giới hạn, cache raw          |
-| VLM hallucination                        | Graph sai                | Provenance, threshold, SHACL, gold comparison   |
+| OVOD không phân biệt mã chi tiết         | End-to-end accuracy thấp | Chuyển candidate mơ hồ sang curator review      |
+| Detector output sai schema               | Ingestion thất bại       | JSON Schema, validation và cache raw output     |
+| Detector dự đoán sai                     | Graph sai                | Provenance, threshold, SHACL, gold comparison   |
 | Merge nhầm hai biển                      | Relation sai             | Image ID + IoU + class compatibility            |
 | OWL rule quá mạnh                        | Suy luận sai             | OWL 2 RL subset và regression tests             |
 | Dùng `owl:sameAs` sai                    | Lan truyền lỗi           | Dùng SKOS alias/mapping                         |
@@ -2724,7 +2708,7 @@ Demo end-to-end trả về kết quả graph và explanation.
 5. Confidence và provenance phải hiển thị với prediction.
 6. Ảnh có người hoặc biển số xe cần tuân thủ điều kiện sử dụng dataset.
 7. Không che giấu lỗi trên rare classes.
-8. VLM-generated assertions phải phân biệt với gold annotation.
+8. Model-generated assertions phải phân biệt với gold annotation.
 
 ---
 
@@ -2825,7 +2809,7 @@ Người dùng chọn một ảnh trong dataset.
 Hiển thị:
 
 - Gold bounding boxes.
-- Tùy chọn bật prediction từ OVOD/VLM.
+- Tùy chọn bật prediction từ detector/OVOD.
 - Raw class và canonical ontology class.
 
 
@@ -2961,18 +2945,18 @@ Kiến trúc đề xuất chủ động tách lớp perception khỏi lớp know
 ## Phụ lục B — Ma trận nguồn tri thức
 
 
-| Dữ liệu           | Annotation           | OVOD        | VLM          | Ontology/Rule  |
-| ----------------- | -------------------- | ----------- | ------------ | -------------- |
-| Bounding box      | Chính                | Chính       | Phụ          | Không          |
-| Raw class         | Chính                | Có thể      | Có thể       | Không          |
-| Canonical class   | Qua mapping          | Qua mapping | Qua mapping  | Định nghĩa     |
-| Sign hierarchy    | Không                | Không       | Không        | Chính          |
-| Maneuver          | Gián tiếp từ class   | Hạn chế     | Có thể trích | Chuẩn hóa      |
-| Target vehicle    | Gián tiếp từ class   | Hạn chế     | Có thể trích | Chuẩn hóa      |
-| Numeric parameter | Một phần trong label | Hạn chế     | Có thể đọc   | Biểu diễn/unit |
-| Confidence        | Gold policy          | Có          | Có           | Không          |
-| Provenance        | Dataset              | Model run   | Model run    | Schema         |
-| Inferred fact     | Không                | Không       | Không        | Reasoner       |
+| Dữ liệu           | Annotation           | Detector/OVOD | Ontology/Rule  |
+| ----------------- | -------------------- | ------------- | -------------- |
+| Bounding box      | Chính                | Chính         | Không          |
+| Raw class         | Chính                | Có thể        | Không          |
+| Canonical class   | Qua mapping          | Qua mapping   | Định nghĩa     |
+| Sign hierarchy    | Không                | Không         | Chính          |
+| Maneuver          | Gián tiếp từ class   | Hạn chế       | Chuẩn hóa      |
+| Target vehicle    | Gián tiếp từ class   | Hạn chế       | Chuẩn hóa      |
+| Numeric parameter | Một phần trong label | Hạn chế       | Biểu diễn/unit |
+| Confidence        | Gold policy          | Có            | Không          |
+| Provenance        | Dataset              | Model run     | Schema         |
+| Inferred fact     | Không                | Không         | Reasoner       |
 
 
 ---
