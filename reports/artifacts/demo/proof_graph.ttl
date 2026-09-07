@@ -1,0 +1,104 @@
+@prefix cokb: <http://iqvia.com/ontologies/cokb/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+cokb:proof-mapping-k05-1-da0b-y a cokb:ProofTrace ;
+    cokb:provesAssessment cokb:assessment-mapping-k05-1-da0b-y ;
+    cokb:producedByRule cokb:R-EXACT-LABEL ;
+    cokb:hasPremiseCount 2 ;
+    cokb:hasPremise cokb:premise-mapping-k05-1-da0b-y-1 ;
+    cokb:hasPremise cokb:premise-mapping-k05-1-da0b-y-2 ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full .
+
+cokb:premise-mapping-k05-1-da0b-y-1 a cokb:Premise ;
+    cokb:premisePredicate "normalizedSourceLabel" ;
+    cokb:premiseValue "chronic gingivitis" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-k05-1-da0b-y-2 a cokb:Premise ;
+    cokb:premisePredicate "normalizedTargetLabel" ;
+    cokb:premiseValue "chronic gingivitis" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:proof-mapping-k05-1-da0z a cokb:ProofTrace ;
+    cokb:provesAssessment cokb:assessment-mapping-k05-1-da0z ;
+    cokb:producedByRule cokb:R-INSUFFICIENT-EVIDENCE ;
+    cokb:hasPremiseCount 2 ;
+    cokb:hasPremise cokb:premise-mapping-k05-1-da0z-1 ;
+    cokb:hasPremise cokb:premise-mapping-k05-1-da0z-2 ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full .
+
+cokb:premise-mapping-k05-1-da0z-1 a cokb:Premise ;
+    cokb:premisePredicate "sourceLabel" ;
+    cokb:premiseValue "Chronic gingivitis" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-k05-1-da0z-2 a cokb:Premise ;
+    cokb:premisePredicate "targetLabel" ;
+    cokb:premiseValue "Diseases or disorders of orofacial complex, unspecified" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:proof-mapping-k25-9-da60-y a cokb:ProofTrace ;
+    cokb:provesAssessment cokb:assessment-mapping-k25-9-da60-y ;
+    cokb:producedByRule cokb:R-EXPLICIT-QUALIFIER-CONFLICT ;
+    cokb:hasPremiseCount 3 ;
+    cokb:hasPremise cokb:premise-mapping-k25-9-da60-y-1 ;
+    cokb:hasPremise cokb:premise-mapping-k25-9-da60-y-2 ;
+    cokb:hasPremise cokb:premise-mapping-k25-9-da60-y-3 ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full .
+
+cokb:premise-mapping-k25-9-da60-y-1 a cokb:Premise ;
+    cokb:premisePredicate "sourceLabel" ;
+    cokb:premiseValue "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-k25-9-da60-y-2 a cokb:Premise ;
+    cokb:premisePredicate "targetLabel" ;
+    cokb:premiseValue "Acute haemorrhagic gastric ulcer" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-k25-9-da60-y-3 a cokb:Premise ;
+    cokb:premisePredicate "detectedConflicts" ;
+    cokb:premiseValue "[\"acute <> chronic\", \"hemorrhagic <> without hemorrhage\"]" ;
+    cokb:premiseSource "R-EXPLICIT-QUALIFIER-CONFLICT" .
+
+cokb:proof-mapping-a31-1b21-z a cokb:ProofTrace ;
+    cokb:provesAssessment cokb:assessment-mapping-a31-1b21-z ;
+    cokb:producedByRule cokb:R-EXACT-LABEL ;
+    cokb:hasPremiseCount 2 ;
+    cokb:hasPremise cokb:premise-mapping-a31-1b21-z-1 ;
+    cokb:hasPremise cokb:premise-mapping-a31-1b21-z-2 ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full .
+
+cokb:premise-mapping-a31-1b21-z-1 a cokb:Premise ;
+    cokb:premisePredicate "normalizedSourceLabel" ;
+    cokb:premiseValue "infection due to other mycobacteria" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-a31-1b21-z-2 a cokb:Premise ;
+    cokb:premisePredicate "normalizedTargetLabel" ;
+    cokb:premiseValue "infection due to other mycobacteria" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:proof-mapping-a31-1h0z a cokb:ProofTrace ;
+    cokb:provesAssessment cokb:assessment-mapping-a31-1h0z ;
+    cokb:producedByRule cokb:R-GENERALIZED-CONDITION ;
+    cokb:hasPremiseCount 3 ;
+    cokb:hasPremise cokb:premise-mapping-a31-1h0z-1 ;
+    cokb:hasPremise cokb:premise-mapping-a31-1h0z-2 ;
+    cokb:hasPremise cokb:premise-mapping-a31-1h0z-3 ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full .
+
+cokb:premise-mapping-a31-1h0z-1 a cokb:Premise ;
+    cokb:premisePredicate "sourceLabel" ;
+    cokb:premiseValue "Infection due to other mycobacteria" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-a31-1h0z-2 a cokb:Premise ;
+    cokb:premisePredicate "targetLabel" ;
+    cokb:premiseValue "Infection, unspecified" ;
+    cokb:premiseSource "icd10cm_to_icd11_2024_full" .
+
+cokb:premise-mapping-a31-1h0z-3 a cokb:Premise ;
+    cokb:premisePredicate "explicitConflict" ;
+    cokb:premiseValue "false" ;
+    cokb:premiseSource "R-GENERALIZED-CONDITION" .

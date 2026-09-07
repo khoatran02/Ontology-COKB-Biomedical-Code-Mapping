@@ -1,0 +1,100 @@
+@prefix cokb: <http://iqvia.com/ontologies/cokb/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+cokb:CodeConceptShape a sh:NodeShape ;
+    sh:targetClass cokb:CodeConcept ;
+    sh:property [
+        sh:path cokb:codeSystem ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 1
+    ] ;
+    sh:property [
+        sh:path cokb:mappedValue ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 1
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 1
+    ] .
+
+cokb:MappingAssertionShape a sh:NodeShape ;
+    sh:targetClass cokb:MappingAssertion ;
+    sh:property [
+        sh:path cokb:mapsFrom ;
+        sh:class cokb:CodeConcept ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:mapsTo ;
+        sh:class cokb:CodeConcept ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path prov:wasDerivedFrom ;
+        sh:minCount 1
+    ] .
+
+cokb:RuleBasedAssessmentShape a sh:NodeShape ;
+    sh:targetClass cokb:RuleBasedAssessment ;
+    sh:property [
+        sh:path cokb:assessesMapping ;
+        sh:class cokb:MappingAssertion ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:hasMappingLevel ;
+        sh:class cokb:MappingLevel ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:producedByRule ;
+        sh:class cokb:InferenceRule ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] .
+
+cokb:PremiseShape a sh:NodeShape ;
+    sh:targetClass cokb:Premise ;
+    sh:property [ sh:path cokb:premisePredicate ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path cokb:premiseValue ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path cokb:premiseSource ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+cokb:ProofTraceShape a sh:NodeShape ;
+    sh:targetClass cokb:ProofTrace ;
+    sh:property [
+        sh:path cokb:provesAssessment ;
+        sh:class cokb:MappingAssessment ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:producedByRule ;
+        sh:class cokb:InferenceRule ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:hasPremise ;
+        sh:class cokb:Premise ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path cokb:supportedBy ;
+        sh:class cokb:EvidenceSource ;
+        sh:minCount 1
+    ] .

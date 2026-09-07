@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "mappings": [
+    {
+      "mapping_id": "mapping-k05-1-da0b-y",
+      "source": {"system": "ICD10WHO", "code": "K05.1", "label": "Chronic gingivitis"},
+      "target": {"system": "ICD11", "code": "DA0B.Y", "label": "Chronic gingivitis"},
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-k05-1-da0z",
+      "source": {"system": "ICD10WHO", "code": "K05.1", "label": "Chronic gingivitis"},
+      "target": {"system": "ICD11", "code": "DA0Z", "label": "Diseases or disorders of orofacial complex, unspecified"},
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-k25-9-da60-y",
+      "source": {"system": "ICD10CM", "code": "K25.9", "label": "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation"},
+      "target": {"system": "ICD11", "code": "DA60.Y", "label": "Acute haemorrhagic gastric ulcer"},
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-a31-1b21-z",
+      "source": {"system": "ICD10WHO", "code": "A31", "label": "Infection due to other mycobacteria"},
+      "target": {"system": "ICD11", "code": "1B21.Z", "label": "infection due to other mycobacteria"},
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-a31-1h0z",
+      "source": {"system": "ICD10WHO", "code": "A31", "label": "Infection due to other mycobacteria"},
+      "target": {"system": "ICD11", "code": "1H0Z", "label": "Infection, unspecified"},
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    }
+  ]
+}

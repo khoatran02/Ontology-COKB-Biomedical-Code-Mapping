@@ -10,7 +10,12 @@ build
 # input and generated files
 input/*
 output/*
+graph_data/cokb/
+graph_data/cokb_demo/
 # python cache:
 __pycache__
 # macOS files:
 *.DS_Store
+
+# Environment variables & secrets
+.env

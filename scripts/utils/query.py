@@ -92,7 +92,12 @@ def read_prompts(prompt_file_path: str,
              query_id = int(row["Task ID"]),
              label = row["Task Label"],
              task = row["Task Summary"], 
-             instruction = row["Instruction"],
+             # The committed NL2SPARQL workbook uses singular property names in
+             # its schema while the graph, examples, and retrieval code use
+             # :mapsFrom/:mapsTo. Normalize that legacy inconsistency here.
+             instruction = str(row["Instruction"])
+                .replace(":mapFrom", ":mapsFrom")
+                .replace(":mapTo", ":mapsTo"),
              region = row["Region"],
              note=row["Note"])
     

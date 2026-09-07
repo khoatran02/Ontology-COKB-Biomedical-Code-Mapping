@@ -1,0 +1,146 @@
+\chapter{Toán tử và cơ chế suy luận}\label{chap:reasoning}
+
+\section{Chuẩn hóa và trích đặc trưng}
+Gọi $N(\ell)$ là phép chuẩn hóa nhãn được cài đặt trong
+\src{normalize_label}. Hàm thực hiện lần lượt Unicode NFKC, chuyển dạng chữ
+bằng \texttt{casefold}, thay một tập dấu phân cách thành khoảng trắng,
+rút gọn khoảng trắng và thay từ theo bảng bí danh.
+Bảng bí danh hiện chỉ có ba mục: \texttt{haemorrhage} thành
+\texttt{hemorrhage}, \texttt{haemorrhagic} thành \texttt{hemorrhagic}
+và \texttt{renal} thành \texttt{kidney}.
+Đây là tri thức từ vựng được khai báo thủ công, không phải mô hình học đồng nghĩa.
+
+Tập từ nội dung được định nghĩa theo code là
+\begin{equation}
+  T(\ell)=\operatorname{set}(\operatorname{split}(N(\ell)))\setminus W,
+  \quad
+  W=\{\text{a, an, and, due, of, or, the, to}\}.
+  \label{eq:tokens}
+\end{equation}
+Biểu diễn tập hợp bỏ qua thứ tự và số lần xuất hiện của từ.
+Phép chuẩn hóa mã là loại khoảng trắng rồi viết hoa; dấu chấm trong mã
+được giữ. Tuy nhiên, chuẩn hóa mã chủ yếu phục vụ tìm kiếm và kiểm tra
+self-mapping, không được áp dụng thống nhất ở mọi bước tạo định danh.
+
+\section{Phát hiện xung đột theo cụm từ}
+Gọi $D$ là tập các cặp cụm từ đối lập được khai báo.
+Một phần tử điển hình là $(\text{acute},\text{chronic})$;
+những cặp khác gồm benign và malignant; left và right; type 1 và type 2;
+with hemorrhage và without hemorrhage; hemorrhagic và without hemorrhage;
+with perforation và without perforation.
+Phép kiểm tra có dạng
+\begin{equation}
+\begin{split}
+X(\ell_s,\ell_t)=\{(u,v)\in D:\;&
+[u\sqsubseteq N(\ell_s)\land v\sqsubseteq N(\ell_t)]\\
+&{}\lor[v\sqsubseteq N(\ell_s)\land u\sqsubseteq N(\ell_t)]\},
+\end{split}
+\label{eq:conflict}
+\end{equation}
+trong đó $\sqsubseteq$ là quan hệ xuất hiện như \emph{chuỗi con}.
+Ký hiệu này không biểu diễn quan hệ chuyên biệt hóa bệnh.
+Điều kiện xung đột là $X(\ell_s,\ell_t)\ne\varnothing$.
+
+Do dùng chuỗi con, phép kiểm tra chưa hiểu phạm vi phủ định hoặc cấu trúc
+“unspecified as acute or chronic”. Danh sách xung đột được lưu vào proof
+giúp người dùng phát hiện những nhận định quá đơn giản này.
+
+\section{Năm luật và thứ tự áp dụng}
+Đặt $S=T(\ell_s)$, $T=T(\ell_t)$ và
+$U=\{\text{unspecified},\text{other}\}$.
+Các điều kiện $P_j$ của năm luật được viết tương ứng với Python như sau:
+\begin{align}
+P_1(m)&:\ N(\ell_s)=N(\ell_t), & y_1&=A, \label{eq:r1}\\
+P_2(m)&:\ X(\ell_s,\ell_t)\ne\varnothing, & y_2&=C, \label{eq:r2}\\
+P_3(m)&:\ X=\varnothing \land S\ne\varnothing\land T\ne\varnothing
+            \land(S\subsetneq T\lor T\subsetneq S), & y_3&=B, \label{eq:r3}\\
+P_4(m)&:\ X=\varnothing \land S\cap T\ne\varnothing
+            \land(S\cup T)\cap U\ne\varnothing, & y_4&=B, \label{eq:r4}\\
+P_5(m)&:\ \mathrm{true}, & y_5&=\bot. \label{eq:r5}
+\end{align}
+Trong \eqref{eq:r3}--\eqref{eq:r4}, $X$ viết gọn cho
+$X(\ell_s,\ell_t)$. Luật thứ tư chỉ yêu cầu có từ chung và có từ chỉ tính
+khái quát; nó không kiểm tra rằng từ chung là tên bệnh hay rằng hai
+khái niệm thuộc cùng một nhánh ontology.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Mã luật và bằng chứng được trả về khi luật khớp}\label{tab:rules}
+\begin{tabularx}{\textwidth}{c p{6.0cm} Y}
+\toprule
+Ưu tiên & Mã luật & Premise trong proof\\
+\midrule
+1 & \src{R-EXACT-LABEL} & Hai nhãn sau chuẩn hóa.\\
+2 & \src{R-EXPLICIT-QUALIFIER-CONFLICT} & Hai nhãn gốc và danh sách xung đột.\\
+3 & \src{R-COMPATIBLE-SPECIFICITY} & Hai nhãn gốc và explicitConflict=false.\\
+4 & \src{R-GENERALIZED-CONDITION} & Hai nhãn gốc và explicitConflict=false.\\
+5 & \src{R-INSUFFICIENT-EVIDENCE} & Hai nhãn gốc.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\src{COKBReasoner.assess} dừng ở luật đầu tiên khớp:
+\begin{equation}
+ j^*(m)=\min\{j:P_j(m)=\mathrm{true}\},\qquad
+ f_{\K}(m)=(y_{j^*},\texttt{rule\_based},\pi_{j^*}).
+ \label{eq:firstmatch}
+\end{equation}
+Luật mặc định $P_5$ bảo đảm luôn có đầu ra với tập luật chuẩn.
+Thứ tự là một phần ngữ nghĩa của hệ thống: nhãn giống hệt nhau được
+xét trước xung đột. Một tập luật tùy chỉnh không có fallback có thể làm
+reasoner phát sinh lỗi khi không luật nào khớp.
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=Python,caption={Giả mã tương ứng với vòng lặp của COKBReasoner.assess},label={lst:reason}]
+def assess(mapping, ordered_rules):
+    for rule in ordered_rules:
+        match = rule.evaluate(mapping)
+        if match is None:
+            continue
+        proof = build_proof(mapping, match)
+        return build_assessment(mapping, match, proof)
+    raise RuntimeError("Rule set did not produce an assessment")
+\end{lstlisting}
+\end{minipage}
+
+Giả mã trong Mã minh họa~\ref{lst:reason} lược bỏ thao tác dựng dataclass.
+Đây là cơ chế áp dụng luật một lượt trên từng mapping, không lặp đến điểm
+cố định, không sử dụng assessment của mapping trước làm tiền đề cho mapping
+sau và không tự suy diễn bắc cầu giữa các hệ mã.
+
+\section{Vết suy luận và ý nghĩa của tính tái lập}
+Với một luật khớp, vết suy luận có cấu trúc
+\begin{equation}
+  \pi=(q,\mathcal{P},r,\mathcal{E}),
+  \qquad
+  \frac{\mathcal{P}\ ;\ r}{q},
+  \label{eq:proof}
+\end{equation}
+trong đó $q$ là kết luận, $\mathcal{P}$ là tập premise, $r$ là mã luật và
+$\mathcal{E}$ là nguồn bằng chứng. Ký hiệu phân số trong
+\eqref{eq:proof} mô tả cấu trúc giải trình, không khẳng định chương trình
+đã có một bộ kiểm chứng chứng minh độc lập.
+
+Proof của luật 3 và 4 lưu nhãn nhưng chưa lưu tường minh tập từ sau xử lý,
+quan hệ bao hàm hay từ chung. Proof của fallback cũng chưa liệt kê vì sao
+từng luật trước thất bại. Do đó, vết hiện tại đủ để xác định luật và dữ
+liệu đầu vào, nhưng chưa là nhật ký đầy đủ của mọi bước tính toán.
+
+Tính xác định được hiểu là cùng input, cùng code và cùng thứ tự luật thì
+thu được cùng assessment. Trong \src{COKBRepository.load}, nếu JSON đã
+có assessments, code tính lại chúng bằng luật hiện hành.
+Vì thế, mở một store sau khi sửa luật có thể cho kết quả mới; muốn tái lập
+lịch sử cần lưu phiên bản code bên cạnh dữ liệu.
+
+\section{Độ phức tạp và giới hạn biểu diễn}
+Gọi $n$ là số mapping, $k$ là số luật và $L$ là tổng độ dài hai nhãn.
+Với số cặp xung đột cố định, mỗi phép chuẩn hóa và kiểm tra có chi phí
+xấp xỉ tuyến tính theo $L$. Tổng chi phí đánh giá có dạng
+\begin{equation}
+  O(nkL),\qquad k=5 \text{ trong tập luật mặc định}.
+\end{equation}
+Một số phép chuẩn hóa được lặp lại qua các luật; chưa có cache đặc trưng.
+Truy vấn \src{find_mappings} quét danh sách mapping nên có chi phí
+$O(n)$ nếu xem chiều dài mã là bị chặn.
+Các công thức này là phân tích thuật toán từ source, không phải kết quả
+đo tốc độ hay cam kết hiệu năng trên graph đầy đủ.

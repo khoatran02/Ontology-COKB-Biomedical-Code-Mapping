@@ -1,0 +1,81 @@
+@prefix cokb: <http://iqvia.com/ontologies/cokb/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+cokb:evidence-icd10cm_to_icd11_2024_full a cokb:EvidenceSource ;
+    rdfs:label "icd10cm_to_icd11_2024_full" .
+
+cokb:concept-ICD10WHO-K05.1 a cokb:CodeConcept ;
+    cokb:codeSystem "ICD10WHO" ;
+    cokb:mappedValue "K05.1" ;
+    rdfs:label "Chronic gingivitis" .
+
+cokb:concept-ICD11-DA0B.Y a cokb:CodeConcept ;
+    cokb:codeSystem "ICD11" ;
+    cokb:mappedValue "DA0B.Y" ;
+    rdfs:label "Chronic gingivitis" .
+
+cokb:mapping-k05-1-da0b-y a cokb:MappingAssertion ;
+    cokb:mapsFrom cokb:concept-ICD10WHO-K05.1 ;
+    cokb:mapsTo cokb:concept-ICD11-DA0B.Y ;
+    prov:wasDerivedFrom cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:assertedBy "source_graph" .
+
+cokb:concept-ICD11-DA0Z a cokb:CodeConcept ;
+    cokb:codeSystem "ICD11" ;
+    cokb:mappedValue "DA0Z" ;
+    rdfs:label "Diseases or disorders of orofacial complex, unspecified" .
+
+cokb:mapping-k05-1-da0z a cokb:MappingAssertion ;
+    cokb:mapsFrom cokb:concept-ICD10WHO-K05.1 ;
+    cokb:mapsTo cokb:concept-ICD11-DA0Z ;
+    prov:wasDerivedFrom cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:assertedBy "source_graph" .
+
+cokb:concept-ICD10CM-K25.9 a cokb:CodeConcept ;
+    cokb:codeSystem "ICD10CM" ;
+    cokb:mappedValue "K25.9" ;
+    rdfs:label "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation" .
+
+cokb:concept-ICD11-DA60.Y a cokb:CodeConcept ;
+    cokb:codeSystem "ICD11" ;
+    cokb:mappedValue "DA60.Y" ;
+    rdfs:label "Acute haemorrhagic gastric ulcer" .
+
+cokb:mapping-k25-9-da60-y a cokb:MappingAssertion ;
+    cokb:mapsFrom cokb:concept-ICD10CM-K25.9 ;
+    cokb:mapsTo cokb:concept-ICD11-DA60.Y ;
+    prov:wasDerivedFrom cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:assertedBy "source_graph" .
+
+cokb:concept-ICD10WHO-A31 a cokb:CodeConcept ;
+    cokb:codeSystem "ICD10WHO" ;
+    cokb:mappedValue "A31" ;
+    rdfs:label "Infection due to other mycobacteria" .
+
+cokb:concept-ICD11-1B21.Z a cokb:CodeConcept ;
+    cokb:codeSystem "ICD11" ;
+    cokb:mappedValue "1B21.Z" ;
+    rdfs:label "infection due to other mycobacteria" .
+
+cokb:mapping-a31-1b21-z a cokb:MappingAssertion ;
+    cokb:mapsFrom cokb:concept-ICD10WHO-A31 ;
+    cokb:mapsTo cokb:concept-ICD11-1B21.Z ;
+    prov:wasDerivedFrom cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:assertedBy "source_graph" .
+
+cokb:concept-ICD11-1H0Z a cokb:CodeConcept ;
+    cokb:codeSystem "ICD11" ;
+    cokb:mappedValue "1H0Z" ;
+    rdfs:label "Infection, unspecified" .
+
+cokb:mapping-a31-1h0z a cokb:MappingAssertion ;
+    cokb:mapsFrom cokb:concept-ICD10WHO-A31 ;
+    cokb:mapsTo cokb:concept-ICD11-1H0Z ;
+    prov:wasDerivedFrom cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:supportedBy cokb:evidence-icd10cm_to_icd11_2024_full ;
+    cokb:assertedBy "source_graph" .

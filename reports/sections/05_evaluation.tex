@@ -1,0 +1,241 @@
+\chapter{Thực nghiệm và phân tích kết quả}\label{chap:evaluation}
+
+\section{Thiết kế thực nghiệm}
+Báo cáo kiểm tra ba câu hỏi: hệ thống có xuất được assessment và proof
+cho dữ liệu mẫu hay không; năm luật bao phủ bao nhiêu cặp nhãn gold;
+và độ chính xác trong phần được đánh giá là bao nhiêu.
+Các kết quả dưới đây được chạy lại từ source ngày 07/09/2026
+bằng Python 3.12.14 trong môi trường \src{.venv}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Các dữ liệu và kiểm tra được sử dụng}\label{tab:data}
+\begin{tabularx}{\textwidth}{p{3.3cm}p{2.0cm}Y}
+\toprule
+Thành phần & Quy mô & Mục đích và giới hạn\\
+\midrule
+Fixture JSON & 5 mapping & Minh họa chức năng build, query, explain và bốn mức đầu ra.\\
+Gold XLSX & 500 cặp nhãn & Đo khả năng phân loại A/B/C; không đo khả năng tìm mã đích.\\
+Unit tests & 19 test & Kiểm tra các nhánh code; SHACL là một test tùy chọn.\\
+Graph store & 0 quad & Trạng thái đọc tại lần kiểm tra; chưa cung cấp dữ liệu thực nghiệm đầy đủ.\\
+TTL nguồn & LFS pointer & Khai báo object 262.786.162 byte, chưa phải nội dung RDF đầy đủ.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Gold nằm tại
+\src{gold_datasets/mapping_level/code_pair_mapping_level__gold_standard__reasoning.xlsx}.
+Evaluator đọc hai nhãn và nhãn chuẩn từ sheet đầu tiên, dựng CodeConcept
+với mã giả S0/T0, S1/T1, rồi gọi reasoner.
+Trường gold chỉ dùng để so sánh sau dự đoán, không được đưa vào điều kiện luật.
+Tên evidence \texttt{mapping\_level\_gold\_standard} chỉ là metadata của
+fixture đánh giá. Tập dữ liệu này là bộ tham chiếu sẵn có; không có thiết kế
+chia train/validation/test mới hay khảo sát chuyên gia độc lập trong đồ án.
+
+\section{Các chỉ số}
+Gọi $N$ là số cặp, $g_i\in\{A,B,C\}$ là nhãn chuẩn,
+$\hat y_i\in\{A,B,C,\bot\}$ là dự đoán.
+Đặt $a_i=\Ind[\hat y_i\ne\bot]$ và
+$c_i=\Ind[\hat y_i=g_i]$. Khi đó
+\begin{align}
+ \operatorname{Coverage} &= \frac{\sum_i a_i}{N},\\
+ \operatorname{Accuracy}_{\mathrm{all}} &= \frac{\sum_i c_i}{N},\\
+ \operatorname{Accuracy}_{\mathrm{assessed}}
+ &= \frac{\sum_i c_i}{\sum_i a_i},\\
+ \operatorname{Abstention} &= 1-\operatorname{Coverage}.
+\end{align}
+Trong code, tỷ số có mẫu số bằng 0 được trả về 0.
+Với tập gold chỉ gồm A/B/C, có đẳng thức
+\begin{equation}
+ \operatorname{Accuracy}_{\mathrm{all}}
+ =\operatorname{Coverage}\cdot
+  \operatorname{Accuracy}_{\mathrm{assessed}}.
+ \label{eq:metricrelation}
+\end{equation}
+Việc coi \Unassessed{} là không đúng trong accuracy toàn tập không
+biến nó thành một lớp bệnh hay một nhãn gold mới.
+
+Với từng mức $\ell\in\{A,B,C\}$,
+\begin{equation}
+ P_\ell=\frac{TP_\ell}{TP_\ell+FP_\ell},\quad
+ R_\ell=\frac{TP_\ell}{TP_\ell+FN_\ell},\quad
+ F_{1,\ell}=\frac{2P_\ell R_\ell}{P_\ell+R_\ell}.
+\end{equation}
+Các cặp gold mức $\ell$ nhưng bị từ chối vẫn nằm trong $FN_\ell$.
+Do đó recall phản ánh cả giới hạn bao phủ.
+
+\section{Kết quả chức năng trên năm mapping}
+\begin{table}[htbp]
+\centering\small
+\caption{Đầu ra tái lập trên fixture có sẵn}\label{tab:sample}
+\begin{tabularx}{\textwidth}{lllY}
+\toprule
+Nguồn & Đích & Đầu ra & Luật được chọn\\
+\midrule
+K05.1 & DA0B.Y & A & Exact label.\\
+K05.1 & DA0Z & $\bot$ & Insufficient evidence.\\
+K25.9 & DA60.Y & C & Explicit qualifier conflict.\\
+A31 & 1B21.Z & A & Exact label.\\
+A31 & 1H0Z & B & Generalized condition.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+Kiểm tra Python của fixture trả về conforms=true, không có error và warning.
+Năm kết quả có đủ conclusion, premise, rule ID và source trong cấu trúc proof.
+Đây là kiểm tra chức năng trên ví dụ minh họa; không diễn giải thành
+độ chính xác 100\% trên một bộ kiểm thử y sinh độc lập.
+
+Với K05.1 đến DA0Z, hai tập từ không có phần giao phù hợp để kích hoạt
+luật; hệ thống trả $\bot$ dù nhãn đích chứa “unspecified”.
+Điều này minh họa rằng có tên mã và có từ chỉ tính khái quát chưa đủ
+để reasoner suy ra mức B.
+
+Trong ví dụ K25.9 đến DA60.Y, cụm “without hemorrhage” xuất hiện
+ở nhãn nguồn; nhãn đích có từ “haemorrhagic”.
+Phép chuẩn hóa và tìm cụm từ kích hoạt luật xung đột.
+Tuy nhiên, luật cũng bắt gặp “chronic” trong
+“unspecified as acute or chronic” và có thể đưa vào danh sách
+acute/chronic. Trường hợp này cho thấy một đầu ra C có thể đi cùng
+một premise phụ chưa được diễn giải ngữ nghĩa chính xác.
+
+\section{Kết quả trên bộ gold}
+\begin{table}[htbp]
+\centering
+\caption{Kết quả tổng hợp của bộ suy luận xác định}\label{tab:metrics}
+\begin{tabular}{lrr}
+\toprule
+Chỉ số & Phân số hoặc số lượng & Giá trị\\
+\midrule
+Tổng số cặp & 500 & 100,00\%\\
+Được đánh giá & 22/500 & 4,40\%\\
+Đúng trên toàn bộ tập & 21/500 & 4,20\%\\
+Đúng trong phần được đánh giá & 21/22 & 95,45\%\\
+Sai trong phần được đánh giá & 1/22 & 4,55\%\\
+Chưa được đánh giá & 478/500 & 95,60\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Ma trận nhầm lẫn: hàng là gold, cột là dự đoán}\label{tab:confusion}
+\begin{tabular}{lrrrrr}
+\toprule
+Gold & A & B & C & $\bot$ & Tổng\\
+\midrule
+A & 1 & 1 & 0 & 106 & 108\\
+B & 0 & 9 & 0 & 163 & 172\\
+C & 0 & 0 & 11 & 209 & 220\\
+\midrule
+Tổng & 1 & 10 & 11 & 478 & 500\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Precision, recall và F1 theo từng mức; đơn vị \%}\label{tab:perlevel}
+\begin{tabular}{lrrr}
+\toprule
+Mức & Precision & Recall & F1\\
+\midrule
+A & 100,00 & 0,93 & 1,83\\
+B & 90,00 & 5,23 & 9,89\\
+C & 100,00 & 5,00 & 9,52\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  xbar stacked,width=0.91\textwidth,height=6cm,
+  xmin=0,xmax=240,xtick={0,50,100,150,200},
+  xlabel={Số cặp nhãn},ytick={1,2,3},yticklabels={Gold A,Gold B,Gold C},
+  ymin=0.4,ymax=3.6,bar width=17pt,
+  legend style={at={(0.5,-0.42)},anchor=north,legend columns=3,
+    font=\small,draw=none,column sep=6pt},
+  tick label style={font=\small},grid=major,grid style={gray!15},
+  reverse legend=false]
+\addplot[fill=okcolor,draw=none] coordinates {(1,1) (9,2) (11,3)};
+\addplot[fill=warncolor,draw=none] coordinates {(1,1) (0,2) (0,3)};
+\addplot[fill=gray!40,draw=none] coordinates {(106,1) (163,2) (209,3)};
+\legend{Đúng,Sai,Chưa đánh giá}
+\end{axis}
+\end{tikzpicture}
+\caption{Phân bố kết quả theo nhãn chuẩn. Phần chưa đánh giá chiếm ưu thế
+ở cả ba nhóm; các số đếm chi tiết nằm trong Bảng~\ref{tab:confusion}.}
+\label{fig:coverage}
+\end{figure}
+\FloatBarrier
+
+Các bảng và Hình~\ref{fig:coverage} thể hiện hai góc nhìn khác nhau:
+phần được xử lý có ít lỗi, nhưng phần lớn dữ liệu chưa được xử lý.
+Con số 95,45\% chỉ dựa trên 22 cặp; không thể dùng riêng nó để kết luận
+hệ thống đạt hiệu quả cao trên toàn bộ miền bài toán.
+Precision 100\% của A cũng chỉ dựa trên một dự đoán A.
+
+\section{Mức đóng góp của từng luật}
+\begin{table}[htbp]
+\centering\small
+\caption{Số lần từng luật được chọn trên 500 cặp gold}\label{tab:rulecount}
+\begin{tabular}{lrr}
+\toprule
+Luật & Số lần được chọn & Số dự đoán đúng A/B/C\\
+\midrule
+Exact label & 1 & 1\\
+Explicit qualifier conflict & 11 & 11\\
+Compatible specificity & 10 & 9\\
+Generalized condition & 0 & 0\\
+Insufficient evidence & 478 & Không áp dụng\\
+\bottomrule
+\end{tabular}
+\end{table}
+Các số này thống kê \emph{luật được chọn đầu tiên}, không phải số lần
+điều kiện của mỗi luật đúng nếu kiểm tra độc lập. Luật generalized có
+ví dụ dương trong fixture nhưng không được chọn trên bộ gold.
+Đồ án chưa thực hiện ablation thay đổi thứ tự hoặc bỏ từng luật,
+nên chưa kết luận được đóng góp nhân quả của mỗi luật tới chất lượng.
+
+\section{Phân tích lỗi cụ thể}
+Cặp gold có trường \texttt{Label=378} là:
+\begin{samepage}\begin{quote}
+Nguồn: Diabetes mellitus type 2.\\
+Đích: Type 2 diabetes.\\
+Gold: A. Dự đoán: B.
+\end{quote}\end{samepage}
+Hai tập từ sau chuẩn hóa là
+\begin{equation}
+ S=\{\text{diabetes,mellitus,type,2}\},\qquad
+ T=\{\text{type,2,diabetes}\},\qquad T\subsetneq S.
+\end{equation}
+Chuỗi không giống hệt nhau nên luật 1 không khớp; không có xung đột
+nên luật 3 trả B. Theo gold, khác biệt từ “mellitus” ở cặp này không
+làm thay đổi mức tương đương. Lỗi phản ánh khoảng cách giữa bao hàm
+từ vựng và quan hệ ngữ nghĩa.
+
+Hướng cải thiện là thêm tri thức đồng nghĩa theo miền, có kiểm thử âm
+và đánh giá lại độ bao phủ. Không nên xóa một từ trên mọi nhãn chỉ để
+sửa đúng một dòng gold, vì có thể tạo ra lỗi ở những trường hợp chưa quan sát.
+
+\section{Kiểm thử và tính tái lập}
+Lần chạy \src{python -m unittest discover -s tests -v} thu được
+19 test, gồm 18 đạt và 1 bị bỏ qua do thiếu dependency SHACL tùy chọn.
+Các nhóm đã chạy gồm operators, năm nhánh reasoner, repository,
+validation, importer với dữ liệu giả lập, XLSX, evaluation và SPARQL guard.
+Không báo cáo rằng SHACL đã chạy thành công trong môi trường này.
+
+\placeholderfigure{images/test_results.png}
+{Minh họa kết quả kiểm thử và đánh giá tái lập.}
+{Chụp terminal hiển thị tổng số unit test, test bị skip và JSON metrics
+từ cokb\_eval. Giữ rõ coverage=0.044, overall\_accuracy=0.042,
+accuracy\_when\_assessed=0.954545 và unassessed\_count=478.
+Nếu cài SHACL và chạy lại, cập nhật trạng thái test trong báo cáo.}
+{fig:tests}
+
+Script kèm báo cáo lưu JSON đánh giá, phiên bản Python, hash các file
+source liên quan, hash dữ liệu gold, kết quả unit test và artifact mẫu.
+Các số trong bảng được đối chiếu với những artifact này.
+Không có số đo latency, chi phí LLM, hiệu quả người dùng hoặc kết quả
+triển khai trên toàn bộ ICD trong lần thực nghiệm này.

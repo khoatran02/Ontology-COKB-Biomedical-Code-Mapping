@@ -1,18 +1,40 @@
+from __future__ import annotations
 import abc
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Sequence, Union
 
-import requests
-import transformers
-from azure.identity import ClientSecretCredential
-from langchain.schema import HumanMessage
-from langchain_community.adapters.openai import convert_openai_messages
-from langchain_openai import AzureChatOpenAI
-from transformers import AutoTokenizer, AutoConfig
-from transformers.models.auto.tokenization_auto import TOKENIZER_MAPPING_NAMES
+import json
+import urllib.request
+import urllib.error
 
-from scripts.llm.zero_shot_classification import max_length_from_configs
+try:
+    import requests
+except ImportError:
+    requests = None
+try:
+    import transformers
+    from transformers import AutoTokenizer, AutoConfig
+    from transformers.models.auto.tokenization_auto import TOKENIZER_MAPPING_NAMES
+    from scripts.llm.zero_shot_classification import max_length_from_configs
+except ImportError:
+    transformers = None
+    AutoTokenizer = None
+    AutoConfig = None
+    TOKENIZER_MAPPING_NAMES = None
+    max_length_from_configs = None
+
+try:
+    from azure.identity import ClientSecretCredential
+    from langchain.schema import HumanMessage
+    from langchain_community.adapters.openai import convert_openai_messages
+    from langchain_openai import AzureChatOpenAI
+except ImportError:
+    ClientSecretCredential = None
+    HumanMessage = None
+    convert_openai_messages = None
+    AzureChatOpenAI = None
+
 from scripts.llm.deployments import *
 from scripts.llm.configs import *
 
@@ -74,14 +96,8 @@ class BaseHuggingFaceLLMClient(BaseLLMClient):
     """
 
     def __init__(self, model_name, temperature: float = 1.0, chat_completion_enabled: bool = False):
-        """
-        Initializes a new BaseHuggingFaceLLMClient object.
-
-        Args:
-            model_name: Hugging Face model ID.
-            temperature: Temperature to use, usually between 0 and 1. Higher values make the output more random, while lower values make it more focused and deterministic.
-            chat_completion_enabled: Whether to treat the model as a chat model.
-        """
+        if transformers is None:
+            raise ImportError("The 'transformers' package is required for Hugging Face models. Install with: pip install transformers")
         super().__init__(model_name)
         self.chat_completion_enabled = chat_completion_enabled
         self.temperature = temperature
@@ -122,7 +138,7 @@ class AWSClient(BaseHuggingFaceLLMClient):
     def __init__(self, ip, model_name, chat_completion_enabled: bool = False):
         if model_name not in AWS_DEPLOYMENTS:
             raise ValueError(f'Model "{model_name}" is invalid; please choose one of:\n{", ".join(AWS_DEPLOYMENTS)}')
-        super().__init__(model_name, chat_completion_enabled)
+        super().__init__(model_name, chat_completion_enabled=chat_completion_enabled)
         self.ip = ip
         self._tokenizer = self._determine_tokenizer()
 
@@ -266,7 +282,7 @@ class TGIClient(BaseHuggingFaceLLMClient):
         return f'{self._base_url}/info'
 
     def _get_info(self) -> requests.Response:
-        return requests.get(self._info_url)
+        return requests.get(self._info_url, timeout=self._timeout)
 
     def _verify_model_id(self, model_name) -> None:
         """
@@ -292,24 +308,26 @@ class TGIClient(BaseHuggingFaceLLMClient):
         try:
             response = self._get_info()
             return response.status_code == 200
-        except requests.exceptions.ConnectTimeout:
+        except requests.exceptions.RequestException:
             return False
 
 
 class AzureClient(BaseLLMClient):
 
     def __init__(self, model_name, temperature: float = 1.0, chat_completion_enabled: bool = False):
+        if AzureChatOpenAI is None or ClientSecretCredential is None:
+            raise ImportError("Azure and LangChain packages are required for Azure models. Install with: pip install langchain-openai azure-identity")
         if model_name not in AZURE_DEPLOYMENTS:
             raise ValueError(f'Model "{model_name}" is invalid; please choose one of:\n{", ".join(AZURE_DEPLOYMENTS)}')
         super().__init__(model_name)
+        self.chat_completion_enabled = chat_completion_enabled
+        self.temperature = temperature
         self._token_requester = ClientSecretCredential(
                 TENANT_ID,
                 SERVICE_PRINCIPAL,
                 SERVICE_PRINCIPAL_SECRET
             )
         self._connect()
-        self.chat_completion_enabled = chat_completion_enabled
-        self.temperature = temperature
 
     def _connect(self):
         self._token_requested_at = datetime.now().replace(microsecond=0)
@@ -369,5 +387,148 @@ class AzureClient(BaseLLMClient):
         return self._token_object.token is not None
 
 
+class GeminiClient(BaseLLMClient):
+    """
+    Client for interacting with Google Gemini models via Gemini REST API.
+    Does not require external dependencies beyond requests.
+    """
+
+    def __init__(self, model_name: str = "gemini-1.5-flash", temperature: float = 0.2, api_key: str = None):
+        if model_name == "gemini":
+            model_name = "gemini-1.5-flash"
+        super().__init__(model_name)
+        self.temperature = temperature
+        self.api_key = api_key or GEMINI_API_KEY
+        if not self.api_key:
+            LOGGER.warning("GEMINI_API_KEY is not set. Please add GEMINI_API_KEY to .env or environment variables.")
+
+    @property
+    def _url(self):
+        return f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+
+    @property
+    def model_max_length(self):
+        return MAX_TOKENS.get(self.model_name, 1048576)
+
+    def _token_count(self, prompt: PromptType) -> int:
+        if isinstance(prompt, str):
+            return len(prompt) // 4
+        total = 0
+        for m in prompt:
+            if isinstance(m, dict):
+                total += len(str(m.get("content", ""))) // 4
+        return total
+
+    def is_alive(self) -> bool:
+        if not self.api_key:
+            return False
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}?key={self.api_key}"
+        if requests is not None:
+            try:
+                res = requests.get(url, timeout=10)
+                return res.status_code == 200
+            except Exception:
+                return False
+        else:
+            try:
+                req = urllib.request.Request(url)
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    return resp.status == 200
+            except Exception:
+                return False
+
+    def invoke(self, prompt: PromptType, params: dict = None, **kwargs: dict[str, Any]) -> str:
+        if not self.api_key:
+            raise LLMClientException("GEMINI_API_KEY is missing. Set GEMINI_API_KEY in your .env file.")
+
+        system_parts = []
+        contents = []
+
+        if isinstance(prompt, str):
+            contents.append({
+                "role": "user",
+                "parts": [{"text": prompt}]
+            })
+        elif isinstance(prompt, (list, tuple)):
+            for item in prompt:
+                if not isinstance(item, dict):
+                    continue
+                role = item.get("role", "user")
+                content = item.get("content", "")
+                if role == "system":
+                    system_parts.append({"text": content})
+                elif role in ("assistant", "model"):
+                    contents.append({
+                        "role": "model",
+                        "parts": [{"text": content}]
+                    })
+                else:
+                    contents.append({
+                        "role": "user",
+                        "parts": [{"text": content}]
+                    })
+        else:
+            raise ValueError(f"Unsupported prompt type: {type(prompt)}")
+
+        payload = {
+            "contents": contents,
+            "generationConfig": {
+                "temperature": self.temperature,
+            }
+        }
+        if system_parts:
+            payload["system_instruction"] = {
+                "parts": system_parts
+            }
+
+        max_tokens = 2048
+        if params and "max_new_tokens" in params:
+            max_tokens = params["max_new_tokens"]
+        payload["generationConfig"]["maxOutputTokens"] = max_tokens
+
+        if requests is not None:
+            try:
+                response = requests.post(
+                    self._url,
+                    json=payload,
+                    headers={"Content-Type": "application/json"},
+                    timeout=self._timeout
+                )
+            except Exception as e:
+                raise LLMClientException(f"Failed to communicate with Gemini API: {e}")
+
+            if response.status_code != 200:
+                raise LLMClientException(
+                    f"Gemini API request failed with status {response.status_code}: {response.text}"
+                )
+
+            data = response.json()
+        else:
+            data_bytes = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                self._url,
+                data=data_bytes,
+                headers={"Content-Type": "application/json"}
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=self._timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+            except urllib.error.HTTPError as e:
+                err_text = e.read().decode("utf-8", errors="replace")
+                raise LLMClientException(f"Gemini API request failed with status {e.code}: {err_text}")
+            except Exception as e:
+                raise LLMClientException(f"Failed to communicate with Gemini API: {e}")
+        candidates = data.get("candidates", [])
+        if not candidates:
+            feedback = data.get("promptFeedback", {})
+            raise LLMClientException(f"No response candidates returned from Gemini. Feedback: {feedback}")
+
+        candidate = candidates[0]
+        parts = candidate.get("content", {}).get("parts", [])
+        text_chunks = [part.get("text", "") for part in parts if "text" in part]
+        return "".join(text_chunks)
+
+
 class LLMClientException(Exception):
     pass
+

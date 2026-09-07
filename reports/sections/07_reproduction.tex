@@ -1,0 +1,91 @@
+\chapter{Hướng dẫn tái lập và đối chiếu source}
+
+\section{Các lệnh tái lập}
+Thực hiện từ thư mục gốc repository. Các lệnh dưới đây dùng thư mục
+\src{reports/artifacts/demo} cho kết quả mẫu để phân biệt với graph store.
+Nếu sử dụng virtual environment, thay \texttt{python3} bằng
+\src{.venv/bin/python}.
+\begin{lstlisting}
+python3 main.py cokb_build \
+  --input examples/icd_mapping_sample.json \
+  --output reports/artifacts/demo
+
+python3 main.py cokb_query \
+  --store reports/artifacts/demo \
+  --code K05.1 --system ICD10WHO
+
+python3 main.py cokb_explain \
+  --store reports/artifacts/demo \
+  --mapping-id mapping-k05-1-da0b-y
+
+python3 main.py cokb_eval \
+  --output reports/artifacts/evaluation.json
+
+python3 -m unittest discover -s tests -v
+\end{lstlisting}
+Script \src{reports/scripts/collect_evidence.py} thực hiện thu thập
+kết quả dùng trong báo cáo bằng một lệnh:
+\begin{lstlisting}
+python3 reports/scripts/collect_evidence.py
+\end{lstlisting}
+Script chỉ ghi vào \src{reports/artifacts/}; không thay đổi ontology,
+rules, gold hoặc graph store gốc.
+
+SHACL là kiểm tra bổ sung sau khi cài dependency:
+\begin{lstlisting}
+python3 -m pip install -e '.[validation]'
+python3 main.py cokb_shacl \
+  --store reports/artifacts/demo \
+  --report reports/artifacts/shacl_report.ttl
+\end{lstlisting}
+Lệnh này phải được chạy và ghi nhận riêng trước khi thay trạng thái
+SHACL trong kết quả thực nghiệm.
+
+\section{Chỉ mục đối chiếu nội dung với code}
+\begin{longtable}{>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{9.2cm}}
+\caption{Các điểm kiểm chứng chính trong repository}\label{tab:source}\\
+\toprule
+Nội dung báo cáo & Source và điểm kiểm tra\\
+\midrule
+\endfirsthead
+\toprule Nội dung báo cáo & Source và điểm kiểm tra\\\midrule
+\endhead
+Đối tượng và mức đánh giá &
+\src{scripts/cokb/model.py}: CodeConcept, MappingAssertion, MappingAssessment, MappingLevel.\\
+Chuẩn hóa và xung đột &
+\src{scripts/cokb/operators.py}: normalize\_label, content\_tokens, find\_explicit\_conflicts.\\
+Năm điều kiện luật &
+\src{scripts/cokb/rules.py}: các lớp Rule và DEFAULT\_RULES.\\
+Luật đầu tiên khớp &
+\src{scripts/cokb/reasoner.py}: COKBReasoner.assess.\\
+Ba graph và tính lại assessment &
+\src{scripts/cokb/repository.py}: load, infer, asserted\_turtle, inferred\_turtle, proof\_turtle.\\
+Lỗi và cách ly batch &
+\src{scripts/cokb/cli.py}: run\_cokb\_command, \_write\_quarantine.\\
+Các ràng buộc Python &
+\src{scripts/cokb/validation.py}: validate\_mappings.\\
+Các ràng buộc SHACL &
+\src{shapes/biomedical_mapping_shapes.ttl} và \src{scripts/cokb/shacl.py}.\\
+Import và khử trùng &
+\src{scripts/cokb/importer.py}: MAPPING\_QUERY, repository\_from\_solutions.\\
+Độ bao phủ và accuracy &
+\src{scripts/cokb/evaluation.py}: evaluate\_label\_pairs.\\
+Cơ chế dữ liệu mẫu thay thế &
+\src{scripts/utils/indexer.py}: build\_graph\_store, is\_git\_lfs\_pointer.\\
+\bottomrule
+\end{longtable}
+
+\section{Danh sách hình cần bổ sung}
+Các sơ đồ đối tượng và kiến trúc cùng biểu đồ thực nghiệm được vẽ trực
+tiếp bằng TikZ/PGFPlots, không cần ảnh ngoài.
+Ba vị trí sau tự hiển thị ảnh khi file xuất hiện:
+\begin{enumerate}
+ \item Hình~\ref{fig:cli}: \src{images/cli_demo.png}, ảnh truy vấn K05.1
+       cho thấy hai candidate và assessment.
+ \item Hình~\ref{fig:proof}: \src{images/proof_graph.png}, ảnh graph giải
+       thích kết luận A với rule và premise.
+ \item Hình~\ref{fig:tests}: \src{images/test_results.png}, ảnh terminal
+       unit test và metrics được chạy thật.
+\end{enumerate}
+Mô tả ngay trong từng khung giữ chỗ nêu các đối tượng cần xuất hiện.
+LaTeX vẫn biên dịch được khi chưa có ba ảnh này.

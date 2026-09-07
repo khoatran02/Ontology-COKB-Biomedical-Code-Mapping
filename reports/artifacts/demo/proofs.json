@@ -1,0 +1,130 @@
+[
+  {
+    "conclusion": {
+      "mapping_id": "mapping-k05-1-da0b-y",
+      "predicate": "hasMappingLevel",
+      "object": "A"
+    },
+    "premises": [
+      {
+        "predicate": "normalizedSourceLabel",
+        "value": "chronic gingivitis",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "normalizedTargetLabel",
+        "value": "chronic gingivitis",
+        "source": "icd10cm_to_icd11_2024_full"
+      }
+    ],
+    "rule_id": "R-EXACT-LABEL",
+    "sources": [
+      "icd10cm_to_icd11_2024_full"
+    ]
+  },
+  {
+    "conclusion": {
+      "mapping_id": "mapping-k05-1-da0z",
+      "predicate": "hasMappingLevel",
+      "object": "UNASSESSED"
+    },
+    "premises": [
+      {
+        "predicate": "sourceLabel",
+        "value": "Chronic gingivitis",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "targetLabel",
+        "value": "Diseases or disorders of orofacial complex, unspecified",
+        "source": "icd10cm_to_icd11_2024_full"
+      }
+    ],
+    "rule_id": "R-INSUFFICIENT-EVIDENCE",
+    "sources": [
+      "icd10cm_to_icd11_2024_full"
+    ]
+  },
+  {
+    "conclusion": {
+      "mapping_id": "mapping-k25-9-da60-y",
+      "predicate": "hasMappingLevel",
+      "object": "C"
+    },
+    "premises": [
+      {
+        "predicate": "sourceLabel",
+        "value": "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "targetLabel",
+        "value": "Acute haemorrhagic gastric ulcer",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "detectedConflicts",
+        "value": [
+          "acute <> chronic",
+          "hemorrhagic <> without hemorrhage"
+        ],
+        "source": "R-EXPLICIT-QUALIFIER-CONFLICT"
+      }
+    ],
+    "rule_id": "R-EXPLICIT-QUALIFIER-CONFLICT",
+    "sources": [
+      "icd10cm_to_icd11_2024_full"
+    ]
+  },
+  {
+    "conclusion": {
+      "mapping_id": "mapping-a31-1b21-z",
+      "predicate": "hasMappingLevel",
+      "object": "A"
+    },
+    "premises": [
+      {
+        "predicate": "normalizedSourceLabel",
+        "value": "infection due to other mycobacteria",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "normalizedTargetLabel",
+        "value": "infection due to other mycobacteria",
+        "source": "icd10cm_to_icd11_2024_full"
+      }
+    ],
+    "rule_id": "R-EXACT-LABEL",
+    "sources": [
+      "icd10cm_to_icd11_2024_full"
+    ]
+  },
+  {
+    "conclusion": {
+      "mapping_id": "mapping-a31-1h0z",
+      "predicate": "hasMappingLevel",
+      "object": "B"
+    },
+    "premises": [
+      {
+        "predicate": "sourceLabel",
+        "value": "Infection due to other mycobacteria",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "targetLabel",
+        "value": "Infection, unspecified",
+        "source": "icd10cm_to_icd11_2024_full"
+      },
+      {
+        "predicate": "explicitConflict",
+        "value": false,
+        "source": "R-GENERALIZED-CONDITION"
+      }
+    ],
+    "rule_id": "R-GENERALIZED-CONDITION",
+    "sources": [
+      "icd10cm_to_icd11_2024_full"
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "evaluation_order": [
+    "R-EXACT-LABEL",
+    "R-EXPLICIT-QUALIFIER-CONFLICT",
+    "R-COMPATIBLE-SPECIFICITY",
+    "R-GENERALIZED-CONDITION",
+    "R-INSUFFICIENT-EVIDENCE"
+  ],
+  "rules": [
+    {
+      "rule_id": "R-EXACT-LABEL",
+      "condition": "normalized source label equals normalized target label",
+      "conclusion": "mapping level A"
+    },
+    {
+      "rule_id": "R-EXPLICIT-QUALIFIER-CONFLICT",
+      "condition": "labels contain an explicit incompatible qualifier pair",
+      "conclusion": "mapping level C"
+    },
+    {
+      "rule_id": "R-COMPATIBLE-SPECIFICITY",
+      "condition": "one normalized token set strictly contains the other and no conflict exists",
+      "conclusion": "mapping level B"
+    },
+    {
+      "rule_id": "R-GENERALIZED-CONDITION",
+      "condition": "labels share a condition token and one is explicitly generalized",
+      "conclusion": "mapping level B"
+    },
+    {
+      "rule_id": "R-INSUFFICIENT-EVIDENCE",
+      "condition": "no higher-priority deterministic rule matches",
+      "conclusion": "UNASSESSED"
+    }
+  ]
+}

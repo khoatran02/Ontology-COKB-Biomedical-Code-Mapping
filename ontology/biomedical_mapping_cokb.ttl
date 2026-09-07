@@ -1,0 +1,95 @@
+@prefix cokb: <http://iqvia.com/ontologies/cokb/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+cokb:BiomedicalMappingCOKB a owl:Ontology ;
+    rdfs:label "Biomedical code-mapping COKB" ;
+    rdfs:comment "A computable ontology for asserted mappings, deterministic assessments, and proof traces." .
+
+# Concepts (C) and hierarchy (H)
+cokb:CodeSystem a owl:Class .
+cokb:BiomedicalCodeSystem a owl:Class ; rdfs:subClassOf cokb:CodeSystem .
+cokb:ICD9CM a owl:Class ; rdfs:subClassOf cokb:BiomedicalCodeSystem .
+cokb:ICD10CM a owl:Class ; rdfs:subClassOf cokb:BiomedicalCodeSystem .
+cokb:ICD10WHO a owl:Class ; rdfs:subClassOf cokb:BiomedicalCodeSystem .
+cokb:ICD11 a owl:Class ; rdfs:subClassOf cokb:BiomedicalCodeSystem .
+
+cokb:CodeConcept a owl:Class .
+cokb:MappingSet a owl:Class .
+cokb:MappingAssertion a owl:Class .
+cokb:MappingTarget a owl:Class .
+cokb:SimpleTarget a owl:Class ; rdfs:subClassOf cokb:MappingTarget .
+cokb:OneOfTarget a owl:Class ; rdfs:subClassOf cokb:MappingTarget .
+cokb:AllOfTarget a owl:Class ; rdfs:subClassOf cokb:MappingTarget .
+
+cokb:MappingAssessment a owl:Class .
+cokb:RuleBasedAssessment a owl:Class ; rdfs:subClassOf cokb:MappingAssessment .
+cokb:ModelAssessment a owl:Class ; rdfs:subClassOf cokb:MappingAssessment .
+cokb:HumanAssessment a owl:Class ; rdfs:subClassOf cokb:MappingAssessment .
+
+cokb:MappingLevel a owl:Class .
+cokb:Level-A a cokb:MappingLevel ; rdfs:label "Exact mapping" .
+cokb:Level-B a cokb:MappingLevel ; rdfs:label "Partial non-conflicting mapping" .
+cokb:Level-C a cokb:MappingLevel ; rdfs:label "Conflicting mapping" .
+cokb:Level-UNASSESSED a cokb:MappingLevel ; rdfs:label "Insufficient rule evidence" .
+
+cokb:InferenceRule a owl:Class .
+cokb:ProofTrace a owl:Class .
+cokb:Premise a owl:Class .
+cokb:EvidenceSource a owl:Class ; rdfs:subClassOf prov:Entity .
+
+# Relations (R)
+cokb:hasMapping a owl:ObjectProperty ;
+    rdfs:domain cokb:MappingSet ; rdfs:range cokb:MappingAssertion .
+cokb:mapsFrom a owl:ObjectProperty ;
+    rdfs:domain cokb:MappingAssertion ; rdfs:range cokb:CodeConcept .
+cokb:mapsTo a owl:ObjectProperty ;
+    rdfs:domain cokb:MappingAssertion ; rdfs:range cokb:CodeConcept .
+cokb:assessesMapping a owl:ObjectProperty ;
+    rdfs:domain cokb:MappingAssessment ; rdfs:range cokb:MappingAssertion .
+cokb:hasMappingLevel a owl:ObjectProperty ;
+    rdfs:domain cokb:MappingAssessment ; rdfs:range cokb:MappingLevel .
+cokb:producedByRule a owl:ObjectProperty ;
+    rdfs:range cokb:InferenceRule .
+cokb:provesAssessment a owl:ObjectProperty ;
+    rdfs:domain cokb:ProofTrace ; rdfs:range cokb:MappingAssessment .
+cokb:hasPremise a owl:ObjectProperty ;
+    rdfs:domain cokb:ProofTrace ; rdfs:range cokb:Premise .
+cokb:supportedBy a owl:ObjectProperty ;
+    rdfs:range cokb:EvidenceSource .
+
+cokb:mappedValue a owl:DatatypeProperty ;
+    rdfs:domain cokb:CodeConcept ; rdfs:range xsd:string .
+cokb:codeSystem a owl:DatatypeProperty ;
+    rdfs:domain cokb:CodeConcept ; rdfs:range xsd:string .
+cokb:assertedBy a owl:DatatypeProperty ; rdfs:range xsd:string .
+cokb:hasPremiseCount a owl:DatatypeProperty ; rdfs:range xsd:integer .
+cokb:premisePredicate a owl:DatatypeProperty ;
+    rdfs:domain cokb:Premise ; rdfs:range xsd:string .
+cokb:premiseValue a owl:DatatypeProperty ;
+    rdfs:domain cokb:Premise ; rdfs:range xsd:string .
+cokb:premiseSource a owl:DatatypeProperty ;
+    rdfs:domain cokb:Premise ; rdfs:range xsd:string .
+
+# Operators (Ops), functions (Funcs), and rules are first-class catalog entries.
+cokb:Operator a owl:Class .
+cokb:Function a owl:Class .
+cokb:normalizeCode a cokb:Operator .
+cokb:normalizeLabel a cokb:Operator .
+cokb:mergeMapping a cokb:Operator .
+cokb:deduplicateMapping a cokb:Operator .
+cokb:detectLabelConflict a cokb:Operator .
+cokb:validateMapping a cokb:Operator .
+cokb:findMappings a cokb:Function .
+cokb:assessMapping a cokb:Function .
+cokb:explainMapping a cokb:Function .
+cokb:getMappingProof a cokb:Function .
+
+cokb:R-EXACT-LABEL a cokb:InferenceRule .
+cokb:R-EXPLICIT-QUALIFIER-CONFLICT a cokb:InferenceRule .
+cokb:R-COMPATIBLE-SPECIFICITY a cokb:InferenceRule .
+cokb:R-GENERALIZED-CONDITION a cokb:InferenceRule .
+cokb:R-INSUFFICIENT-EVIDENCE a cokb:InferenceRule .

@@ -3,8 +3,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from scripts.eval import eval_code_mapping, eval_mapping_level
-from scripts.run_retrieval import run_retrieval
+from scripts.cokb.cli import add_cokb_subcommands, run_cokb_command
 
 
 def parse_arguments():
@@ -29,23 +28,27 @@ def parse_arguments():
     # --> Sub-parser run_indexing
     index_sp = subparsers.add_parser('run_indexing')
     index_sp.add_argument('-gr', '--graph_data',
+                          required=True,
                           help='Required if TASK is equal to "run_indexing".'
                                'Full local path to the parent of the folder storing graph source ttl data.')
 
     # --> Sub-parser run_retrieval
     retrieve_sp = subparsers.add_parser('run_retrieval')
     retrieve_sp.add_argument('-i', '--input_question',
+                             required=True,
                              help='Required if TASK is equal to "run_retrieval".'
                                   'A text question or path to a list of questions in a file should be specified.')
     retrieve_sp.add_argument('-gs', '--graph_store',
+                             required=True,
                              help='Required if TASK is equal to "run_retrieval".'
                                   'Full local path to the folder where graph store should be loaded from.')
     retrieve_sp.add_argument('-m', '--model_name',
                              type=str,
-                             choices=['gpt-35', 'gpt-4', 'flan-xxl', 'llama-3'],
+                             choices=['gpt-35', 'gpt-4', 'flan-xxl', 'llama-3', 'gemini', 'gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                             required=True,
                              help='Required if TASK is equal to "run_retrieval".'
                                   'One of the model keywords in the list should be provided: '
-                                  '[gpt-35, gpt-4, flan-xxl, llama-3].')
+                                  '[gpt-35, gpt-4, flan-xxl, llama-3, gemini, gemini-3.5-flash, gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro].')
     retrieve_sp.add_argument('-p', '--prompt_mode',
                              type=str,
                              choices=['zero-shot', 'few-shot', 'few-shot-enhanced', 'cot'],
@@ -66,13 +69,16 @@ def parse_arguments():
     # --> Sub-parser eval_code_mapping
     eval_cm_sp = subparsers.add_parser('eval_code_mapping')
     eval_cm_sp.add_argument('-gc', '--gold_cm',
+                            required=True,
                             help='Required if TASK is "eval_code_mapping".'
                                  'Full local path to the code mapping gold dataset.')
     eval_cm_sp.add_argument('-pc', '--pred_cm',
+                            required=True,
                             help='Required if TASK is "eval_code_mapping".'
                                  'Full local path to file or folder containing the code mapping prediction result.')
     eval_cm_sp.add_argument('-mc', '--model_cm',
                             choices=['gpt-35', 'gpt-4', 'flan-xxl', 'llama-3'],
+                            required=True,
                             help='Required if TASK is "eval_code_mapping".'
                                  'Name of the model that generated the result.'
                                  'One of the model keywords in the list should be provided: '
@@ -81,14 +87,19 @@ def parse_arguments():
     # --> Sub-parser eval_mapping_level
     eval_ml_sp = subparsers.add_parser('eval_mapping_level')
     eval_ml_sp.add_argument('-gm', '--gold_ml',
+                            required=True,
                             help='Required if TASK is "eval_mapping_level".'
                                  'Full local path to the mapping level gold dataset.')
     eval_ml_sp.add_argument('-rpm', '--raw_pred_ml',
+                            required=True,
                             help='Required if TASK is "eval_mapping_level".'
                                  'Full local path to folder containing the mapping level raw prediction result.')
     eval_ml_sp.add_argument('-ppm', '--processed_pred_ml',
+                            required=True,
                             help='Required if TASK is "eval_mapping_level".'
                                  'Full local path of the folder to store the processed prediction results.')
+
+    add_cokb_subcommands(subparsers)
 
     int_args = parser.parse_args()
 
@@ -98,22 +109,17 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
     if args.task == "run_indexing":
+        from scripts.utils.indexer import build_graph_store
 
         graph_store = Path(args.graph_data, "graph_store")
-        Path.mkdir(graph_store, exist_ok=True, parents=True)
-
         graph_source = Path(args.graph_data, "source_ttl")
-        assert Path.is_dir(graph_source), f"Graph source TTL files cannot be found under {graph_source}!"
-
-        for filename in os.listdir(graph_source):
-            if filename[-3:] == "ttl":
-                print(filename)
-                filepath = Path(graph_source, filename)
-                subprocess.run(["oxigraph", "load", "--location", graph_store,
-                                "--graph", f"http://iqvia.com/ontologies/{filename[:-4]}",
-                                "--file", filepath])
+        print(f"Indexing graph data from {graph_source} into {graph_store}...")
+        build_graph_store(graph_store, source_ttl_dir=graph_source if graph_source.is_dir() else None)
+        print("Indexing completed successfully!")
 
     elif args.task == "run_retrieval":
+        from scripts.run_retrieval import run_retrieval
+
         summary = run_retrieval(input_question=args.input_question,
                                 graph_data=args.graph_store,
                                 model_name=args.model_name,
@@ -122,17 +128,24 @@ if __name__ == '__main__':
         print(summary)
 
     elif args.task == "eval_code_mapping":
+        from scripts.eval import eval_code_mapping
+
         eval_result = eval_code_mapping.evaluate(gold_path=args.gold_cm,
                                                  pred_path=args.pred_cm,
                                                  model_name=args.model_cm)
         print(eval_result)
 
     elif args.task == "eval_mapping_level":
+        from scripts.eval import eval_mapping_level
+
         eval_result = eval_mapping_level.evaluate(gold_path=args.gold_ml,
                                                   raw_pred_path=args.raw_pred_ml,
                                                   processed_pred_output_dir=args.processed_pred_ml)
         print(eval_result)
 
+    elif args.task and args.task.startswith("cokb_"):
+        raise SystemExit(run_cokb_command(args))
+
     else:
         raise ValueError("Please specify the name of the task to perform. "
-                         "Choices are [run_indexing, run_retrieval, eval_code_mapping, eval_mapping_level]")
+                         "Run main.py -h to see legacy and COKB commands.")

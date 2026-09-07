@@ -1,0 +1,24 @@
+test_reports_coverage_separately_from_accuracy (test_cokb_evaluation.EvaluationTests.test_reports_coverage_separately_from_accuracy) ... ok
+test_converts_and_deduplicates_query_solutions (test_cokb_importer.ImporterTests.test_converts_and_deduplicates_query_solutions) ... ok
+test_detects_explicit_conflict (test_cokb_operators.OperatorTests.test_detects_explicit_conflict) ... ok
+test_normalize_code (test_cokb_operators.OperatorTests.test_normalize_code) ... ok
+test_normalize_label_handles_domain_aliases (test_cokb_operators.OperatorTests.test_normalize_label_handles_domain_aliases) ... ok
+test_conflict_rule (test_cokb_reasoner.ReasonerTests.test_conflict_rule) ... ok
+test_exact_rule (test_cokb_reasoner.ReasonerTests.test_exact_rule) ... ok
+test_generalized_rule (test_cokb_reasoner.ReasonerTests.test_generalized_rule) ... ok
+test_specificity_rule (test_cokb_reasoner.ReasonerTests.test_specificity_rule) ... ok
+test_unassessed_is_explicit (test_cokb_reasoner.ReasonerTests.test_unassessed_is_explicit) ... ok
+test_explanation_contains_rule_and_source (test_cokb_repository.RepositoryTests.test_explanation_contains_rule_and_source) ... ok
+test_vertical_slice_exports_facts_and_proofs (test_cokb_repository.RepositoryTests.test_vertical_slice_exports_facts_and_proofs) ... ok
+test_generated_graphs_conform (test_cokb_shacl.ShaclTests.test_generated_graphs_conform) ... skipped 'optional SHACL dependencies are not installed'
+test_duplicate_mapping_id_is_rejected (test_cokb_validation.ValidationTests.test_duplicate_mapping_id_is_rejected) ... ok
+test_missing_label_is_rejected (test_cokb_validation.ValidationTests.test_missing_label_is_rejected) ... ok
+test_reads_existing_gold_dataset_without_pandas (test_cokb_xlsx.XlsxTests.test_reads_existing_gold_dataset_without_pandas) ... ok
+test_accepts_construct (test_sparql_guard.SparqlGuardTests.test_accepts_construct) ... ok
+test_rejects_select_for_triple_parser (test_sparql_guard.SparqlGuardTests.test_rejects_select_for_triple_parser) ... ok
+test_rejects_update_and_service (test_sparql_guard.SparqlGuardTests.test_rejects_update_and_service) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.015s
+
+OK (skipped=1)

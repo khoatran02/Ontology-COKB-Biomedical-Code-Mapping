@@ -1,0 +1,240 @@
+{
+  "schema_version": "1.0",
+  "mappings": [
+    {
+      "mapping_id": "mapping-k05-1-da0b-y",
+      "source": {
+        "system": "ICD10WHO",
+        "code": "K05.1",
+        "label": "Chronic gingivitis"
+      },
+      "target": {
+        "system": "ICD11",
+        "code": "DA0B.Y",
+        "label": "Chronic gingivitis"
+      },
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-k05-1-da0z",
+      "source": {
+        "system": "ICD10WHO",
+        "code": "K05.1",
+        "label": "Chronic gingivitis"
+      },
+      "target": {
+        "system": "ICD11",
+        "code": "DA0Z",
+        "label": "Diseases or disorders of orofacial complex, unspecified"
+      },
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-k25-9-da60-y",
+      "source": {
+        "system": "ICD10CM",
+        "code": "K25.9",
+        "label": "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation"
+      },
+      "target": {
+        "system": "ICD11",
+        "code": "DA60.Y",
+        "label": "Acute haemorrhagic gastric ulcer"
+      },
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-a31-1b21-z",
+      "source": {
+        "system": "ICD10WHO",
+        "code": "A31",
+        "label": "Infection due to other mycobacteria"
+      },
+      "target": {
+        "system": "ICD11",
+        "code": "1B21.Z",
+        "label": "infection due to other mycobacteria"
+      },
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    },
+    {
+      "mapping_id": "mapping-a31-1h0z",
+      "source": {
+        "system": "ICD10WHO",
+        "code": "A31",
+        "label": "Infection due to other mycobacteria"
+      },
+      "target": {
+        "system": "ICD11",
+        "code": "1H0Z",
+        "label": "Infection, unspecified"
+      },
+      "evidence_source": "icd10cm_to_icd11_2024_full",
+      "asserted_by": "source_graph"
+    }
+  ],
+  "assessments": [
+    {
+      "mapping_id": "mapping-k05-1-da0b-y",
+      "level": "A",
+      "assessment_type": "rule_based",
+      "explanation": "The normalized source and target labels are identical.",
+      "proof": {
+        "conclusion": {
+          "mapping_id": "mapping-k05-1-da0b-y",
+          "predicate": "hasMappingLevel",
+          "object": "A"
+        },
+        "premises": [
+          {
+            "predicate": "normalizedSourceLabel",
+            "value": "chronic gingivitis",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "normalizedTargetLabel",
+            "value": "chronic gingivitis",
+            "source": "icd10cm_to_icd11_2024_full"
+          }
+        ],
+        "rule_id": "R-EXACT-LABEL",
+        "sources": [
+          "icd10cm_to_icd11_2024_full"
+        ]
+      }
+    },
+    {
+      "mapping_id": "mapping-k05-1-da0z",
+      "level": "UNASSESSED",
+      "assessment_type": "rule_based",
+      "explanation": "The deterministic rule set has insufficient evidence to assign A, B, or C.",
+      "proof": {
+        "conclusion": {
+          "mapping_id": "mapping-k05-1-da0z",
+          "predicate": "hasMappingLevel",
+          "object": "UNASSESSED"
+        },
+        "premises": [
+          {
+            "predicate": "sourceLabel",
+            "value": "Chronic gingivitis",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "targetLabel",
+            "value": "Diseases or disorders of orofacial complex, unspecified",
+            "source": "icd10cm_to_icd11_2024_full"
+          }
+        ],
+        "rule_id": "R-INSUFFICIENT-EVIDENCE",
+        "sources": [
+          "icd10cm_to_icd11_2024_full"
+        ]
+      }
+    },
+    {
+      "mapping_id": "mapping-k25-9-da60-y",
+      "level": "C",
+      "assessment_type": "rule_based",
+      "explanation": "The source and target labels contain incompatible qualifiers.",
+      "proof": {
+        "conclusion": {
+          "mapping_id": "mapping-k25-9-da60-y",
+          "predicate": "hasMappingLevel",
+          "object": "C"
+        },
+        "premises": [
+          {
+            "predicate": "sourceLabel",
+            "value": "Gastric ulcer, unspecified as acute or chronic, without hemorrhage or perforation",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "targetLabel",
+            "value": "Acute haemorrhagic gastric ulcer",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "detectedConflicts",
+            "value": [
+              "acute <> chronic",
+              "hemorrhagic <> without hemorrhage"
+            ],
+            "source": "R-EXPLICIT-QUALIFIER-CONFLICT"
+          }
+        ],
+        "rule_id": "R-EXPLICIT-QUALIFIER-CONFLICT",
+        "sources": [
+          "icd10cm_to_icd11_2024_full"
+        ]
+      }
+    },
+    {
+      "mapping_id": "mapping-a31-1b21-z",
+      "level": "A",
+      "assessment_type": "rule_based",
+      "explanation": "The normalized source and target labels are identical.",
+      "proof": {
+        "conclusion": {
+          "mapping_id": "mapping-a31-1b21-z",
+          "predicate": "hasMappingLevel",
+          "object": "A"
+        },
+        "premises": [
+          {
+            "predicate": "normalizedSourceLabel",
+            "value": "infection due to other mycobacteria",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "normalizedTargetLabel",
+            "value": "infection due to other mycobacteria",
+            "source": "icd10cm_to_icd11_2024_full"
+          }
+        ],
+        "rule_id": "R-EXACT-LABEL",
+        "sources": [
+          "icd10cm_to_icd11_2024_full"
+        ]
+      }
+    },
+    {
+      "mapping_id": "mapping-a31-1h0z",
+      "level": "B",
+      "assessment_type": "rule_based",
+      "explanation": "The labels share a condition term, while one is explicitly generalized.",
+      "proof": {
+        "conclusion": {
+          "mapping_id": "mapping-a31-1h0z",
+          "predicate": "hasMappingLevel",
+          "object": "B"
+        },
+        "premises": [
+          {
+            "predicate": "sourceLabel",
+            "value": "Infection due to other mycobacteria",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "targetLabel",
+            "value": "Infection, unspecified",
+            "source": "icd10cm_to_icd11_2024_full"
+          },
+          {
+            "predicate": "explicitConflict",
+            "value": false,
+            "source": "R-GENERALIZED-CONDITION"
+          }
+        ],
+        "rule_id": "R-GENERALIZED-CONDITION",
+        "sources": [
+          "icd10cm_to_icd11_2024_full"
+        ]
+      }
+    }
+  ]
+}

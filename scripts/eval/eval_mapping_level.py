@@ -1,5 +1,6 @@
 import logging
 import os, copy
+import ast
 from typing import Union
 from pathlib import Path
 from sklearn.metrics import confusion_matrix
@@ -24,12 +25,13 @@ def extract_level_from_result(llm_response: str):
         end = text_for_search.find("}")
         if start != -1 and end != -1:
             try:
-                if "mapping_level" in eval(text_for_search[start:end+1]).keys():
-                    level = eval(text_for_search[start:end+1])["mapping_level"]
+                payload = ast.literal_eval(text_for_search[start:end+1])
+                if "mapping_level" in payload.keys():
+                    level = payload["mapping_level"]
                     return level
                 else:
                     text_for_search = text_for_search[end+1:]
-            except:
+            except (SyntaxError, ValueError, TypeError, AttributeError):
                 break
         else:
             break
@@ -38,6 +40,9 @@ def extract_level_from_result(llm_response: str):
     if start != -1: 
         level = text_for_search[start+17:start+20].strip(":").strip("\n").strip(".").upper()
         return level
+    direct_level = text_for_search.strip().upper()
+    if direct_level in {"A", "B", "C"}:
+        return direct_level
 
     
 def read_prediction(prediction_path: Union[str, Path], processed_output_path: Union[str, Path]):
@@ -71,9 +76,10 @@ def calculate_performance(df_gold: pd.DataFrame, df_pred: pd.DataFrame):
     
     # Calculate precision
     cm = confusion_matrix(df_merge["gold"], df_merge["pred"], labels=["A", "B", "C"])
-    precision_a = round(float(cm[0, 0]/np.sum(cm, axis=0)[0]*100), 2)
-    precision_b = round(float(cm[1, 1]/np.sum(cm, axis=0)[1]*100), 2)
-    precision_c = round(float(cm[2, 2]/np.sum(cm, axis=0)[2]*100), 2)
+    predicted_totals = np.sum(cm, axis=0)
+    precision_a = round(float(cm[0, 0]/predicted_totals[0]*100), 2) if predicted_totals[0] else 0.0
+    precision_b = round(float(cm[1, 1]/predicted_totals[1]*100), 2) if predicted_totals[1] else 0.0
+    precision_c = round(float(cm[2, 2]/predicted_totals[2]*100), 2) if predicted_totals[2] else 0.0
 
     return {"accuracy": accuracy, "precision_a": precision_a, "precision_b": precision_b, "precision_c": precision_c}
 

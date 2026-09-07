@@ -1,0 +1,132 @@
+{
+  "collected_at": "2026-09-07T01:02:55.584511+07:00",
+  "python": "3.12.14",
+  "metrics": {
+    "total": 500,
+    "coverage": 0.044,
+    "overall_accuracy": 0.042,
+    "accuracy_when_assessed": 0.9545454545454546,
+    "unassessed_count": 478,
+    "per_level": {
+      "A": {
+        "precision": 1.0,
+        "recall": 0.009259259259259259,
+        "f1": 0.018348623853211007
+      },
+      "B": {
+        "precision": 0.9,
+        "recall": 0.05232558139534884,
+        "f1": 0.09890109890109891
+      },
+      "C": {
+        "precision": 1.0,
+        "recall": 0.05,
+        "f1": 0.09523809523809523
+      }
+    },
+    "confusion": {
+      "A->A": 1,
+      "A->B": 1,
+      "A->UNASSESSED": 106,
+      "B->B": 9,
+      "B->UNASSESSED": 163,
+      "C->C": 11,
+      "C->UNASSESSED": 209
+    }
+  },
+  "selected_rules": {
+    "R-INSUFFICIENT-EVIDENCE": 478,
+    "R-EXPLICIT-QUALIFIER-CONFLICT": 11,
+    "R-COMPATIBLE-SPECIFICITY": 10,
+    "R-EXACT-LABEL": 1
+  },
+  "assessed_errors": [
+    {
+      "row_index_zero_based": 378,
+      "record": {
+        "Label": "378",
+        "Input": "{'original_label': 'Diabetes mellitus type 2', 'mapped_label': 'Type 2 diabetes'}",
+        "output": "A"
+      },
+      "prediction": {
+        "gold": "A",
+        "predicted": "B",
+        "rule_id": "R-COMPATIBLE-SPECIFICITY"
+      }
+    }
+  ],
+  "sample_validation": {
+    "conforms": true,
+    "error_count": 0,
+    "warning_count": 0,
+    "issues": []
+  },
+  "sample_results": [
+    {
+      "mapping_id": "mapping-k05-1-da0b-y",
+      "level": "A",
+      "rule_id": "R-EXACT-LABEL"
+    },
+    {
+      "mapping_id": "mapping-k05-1-da0z",
+      "level": "UNASSESSED",
+      "rule_id": "R-INSUFFICIENT-EVIDENCE"
+    },
+    {
+      "mapping_id": "mapping-k25-9-da60-y",
+      "level": "C",
+      "rule_id": "R-EXPLICIT-QUALIFIER-CONFLICT"
+    },
+    {
+      "mapping_id": "mapping-a31-1b21-z",
+      "level": "A",
+      "rule_id": "R-EXACT-LABEL"
+    },
+    {
+      "mapping_id": "mapping-a31-1h0z",
+      "level": "B",
+      "rule_id": "R-GENERALIZED-CONDITION"
+    }
+  ],
+  "unit_tests_exit_code": 0,
+  "unit_tests_log": "unit_tests.txt",
+  "graph_store_read_only": {
+    "quad_count": 0,
+    "mapping_rows": 0
+  },
+  "source_ttl_is_lfs_pointer": true,
+  "lfs_pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:aada313c42600d520684fe41685e04b9562268a033810b0aa89f4dcbd267a17e\nsize 262786162\n",
+  "sha256": {
+    "scripts/cokb/__init__.py": "afae907697c3d7c984ce510682c2262ea429a4f2c11fa32565b1c685946153f6",
+    "scripts/cokb/cli.py": "4bf738f390700add81ee8aa7170ef9f8aab2fb91057d46e9b8ebd0621774ed4c",
+    "scripts/cokb/evaluation.py": "70ae332f6dbc560bea4ccc07f74a786a455920cfe862060304a8dd0142c7f502",
+    "scripts/cokb/importer.py": "4bbff181e90c36335df4751f2ae46bf7be0cf83710a5d696851cf881e52771c4",
+    "scripts/cokb/model.py": "67fcb0b751015cfcea4875bf5bf436b6de97689ca617652075512dd764dc8344",
+    "scripts/cokb/operators.py": "a0943395152a4212887b19dba08fef9662f196300de839b2192572e36ae93ee1",
+    "scripts/cokb/reasoner.py": "d7c398526803515e8231fee3060f8aaaf4d1a80491cd1af31760faf99ac7acf6",
+    "scripts/cokb/repository.py": "9f08c8212c2129fcd075731b77281b2eb30c7e8c0ecbf9762b10bb233ea25166",
+    "scripts/cokb/rules.py": "d380d2b2f42e385bf3fc73366cd0d750524b8102c3ace63772127eef9ec7a8a8",
+    "scripts/cokb/shacl.py": "185b7af3899ac3cd899720b5b6696334312965aa4cf26ea199f1402a55d19c74",
+    "scripts/cokb/validation.py": "2589bed7800188f2d8692714afd0e5314ac851eed215e47f6d23ca820ae722a0",
+    "scripts/cokb/xlsx.py": "b589731051dc05b15b8bb38759368b0e823678c82428f3c3c0a3726f0c07a36b",
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/test_cokb_evaluation.py": "11ab9782675602c207a4c77d5421c15a98f3543965c92153ef788597d8294c6d",
+    "tests/test_cokb_importer.py": "1dc9de5963025c6c8ccf1a5bc3e48a8f6e9856237d2880522570fa248880e918",
+    "tests/test_cokb_operators.py": "29d2f93327d8830d147be820e72169244d451307e58fbefd4e37b584fbc7a427",
+    "tests/test_cokb_reasoner.py": "06962fddb8e9cbcf565fd5cb978ca4983539024ac3763098a22f5fc3ed42bbbb",
+    "tests/test_cokb_repository.py": "5a038265d8e0ada2af8a1e220aa457b75f99003b2fc4e5e8f7766b54e19151ad",
+    "tests/test_cokb_shacl.py": "a7fc54a30d9d3384f2703e3d928ca624955ba8213422a062eab1288b9d5bac42",
+    "tests/test_cokb_validation.py": "872e5e95c4462c29fd6aacf52850dc46ab5f5b975741f0546f218ab5b154c6f7",
+    "tests/test_cokb_xlsx.py": "e0ede640ed5993e97fe9b5b2a39c2c7f3ad20dde0cfbecded96d60c8da59e351",
+    "tests/test_sparql_guard.py": "8e5e815e118acfce79118391b81b0255c15ee25a57ea37643129bdfe8bdcb929",
+    "gold_datasets/mapping_level/code_pair_mapping_level__gold_standard__reasoning.xlsx": "c207fd892f4226651681eb43ea3ad3dca0060136e6cf678578ccee8d23ce1aee",
+    "examples/icd_mapping_sample.json": "ab523931d99b73852fa6e04e28196bdc408bdc3b3ea23a6ec746ce0cbc76ac7b",
+    "ontology/biomedical_mapping_cokb.ttl": "a880aa519938eed83278fffb23cdff00bd6ed17a15e10653a7cc82ac4363be73",
+    "shapes/biomedical_mapping_shapes.ttl": "bb331b247734164bc615da4ba9dc1cb2b725c3bd5651f774c8e897c128de0a3d",
+    "rules/mapping_rules.json": "e35f2c3b098e33fef1075e855a36c08e0e916b8c6495c4fe05983917b08c25ec",
+    "scripts/utils/indexer.py": "74b2156a84f70ef7fcecaa6375c2f11d4fbec9d5f223e09a6e80ade07bf6134e",
+    "scripts/utils/sparql_guard.py": "4b18aeaadbb55b1707f64fd2c499c123f81442a8b0d3aed3c2b8bf9b3be3ba7d",
+    "main.py": "bc9b0ac22038e3e34e172ade585bf91b27d109c3a2cbaeca8f1f4733debdc469",
+    "pyproject.toml": "63f47e0b52fb5f497b3dcc6fe301fec7cd12c5ba6d11746b5ec95454a51befb8"
+  }
+}

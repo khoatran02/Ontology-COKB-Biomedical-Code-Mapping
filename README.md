@@ -4,6 +4,56 @@ This repository contains the materials for our OntologyRAG prototype - a customi
 
 Full paper describing the pipeline _OntologyRAG: Better and Faster Biomedical Code Mapping with Retrieval-Augmented Generation (RAG) Leveraging Ontology Knowledge Graphs and Large Language Models_ can be accessed [here](https://arxiv.org/abs/2502.18992).
 
+## Deterministic COKB extension
+
+This checkout also contains a computable ontology knowledge base (COKB) extension for biomedical code mappings. It separates three kinds of knowledge:
+
+- asserted mappings retrieved from a source graph;
+- deterministic mapping assessments produced by explicit rules;
+- model or human assessments, which must not silently become asserted facts.
+
+The COKB core runs offline and produces structured proof traces containing a conclusion, premises, a rule identifier, and evidence sources. An LLM may verbalise those results, but it is not the rule engine or the source of truth.
+
+The committed vertical slice uses the K05.1, K25.9, and A31 examples already present in this repository. Run it without installing the legacy LLM dependencies:
+
+```shell
+python3 main.py cokb_demo --output /tmp/ontologyrag-cokb-demo --code K05.1
+```
+
+Build and query persistent artifacts:
+
+```shell
+python3 main.py cokb_build \
+  --input ./examples/icd_mapping_sample.json \
+  --output ./graph_data/cokb
+
+python3 main.py cokb_query --store ./graph_data/cokb --code K25.9
+python3 main.py cokb_explain --store ./graph_data/cokb --mapping-id mapping-k25-9-da60-y
+python3 main.py cokb_validate --input ./examples/icd_mapping_sample.json
+python3 main.py cokb_eval
+```
+
+After restoring and indexing the Git LFS graph, import the existing Oxigraph store into the same COKB contract:
+
+```shell
+python3 main.py cokb_import_graph \
+  --graph-store ./graph_data/graph_store \
+  --source-system ICD10CM \
+  --target-system ICD11 \
+  --output ./graph_data/cokb
+```
+
+Optional standards-based SHACL validation requires the `validation` extra:
+
+```shell
+pip install -e '.[validation]'
+python3 main.py cokb_shacl --store ./graph_data/cokb
+```
+
+The COKB ontology, SHACL shapes, and rule catalog are located under `ontology/`, `shapes/`, and `rules/`. See the [detailed Vietnamese project explanation](docs/ONTOLOGY_COKB_PROJECT_EXPLANATION_VI.md), [COKB architecture](docs/COKB_ARCHITECTURE.md), [rules and proofs](docs/COKB_RULES_AND_PROOFS.md), and [COKB evaluation](docs/COKB_EVALUATION.md).
+
+The full ICD-10-CM to ICD-11 TTL file is tracked with Git LFS. The offline sample does not require it, but full graph integration requires replacing the pointer with the actual LFS object before running indexing.
+
 ## Pre-requisites
 
 ### Set-up oxigraph

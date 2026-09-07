@@ -1,0 +1,46 @@
+{
+  "mapping": {
+    "mapping_id": "mapping-k05-1-da0b-y",
+    "source": {
+      "system": "ICD10WHO",
+      "code": "K05.1",
+      "label": "Chronic gingivitis"
+    },
+    "target": {
+      "system": "ICD11",
+      "code": "DA0B.Y",
+      "label": "Chronic gingivitis"
+    },
+    "evidence_source": "icd10cm_to_icd11_2024_full",
+    "asserted_by": "source_graph"
+  },
+  "assessment": {
+    "mapping_id": "mapping-k05-1-da0b-y",
+    "level": "A",
+    "assessment_type": "rule_based",
+    "explanation": "The normalized source and target labels are identical.",
+    "proof": {
+      "conclusion": {
+        "mapping_id": "mapping-k05-1-da0b-y",
+        "predicate": "hasMappingLevel",
+        "object": "A"
+      },
+      "premises": [
+        {
+          "predicate": "normalizedSourceLabel",
+          "value": "chronic gingivitis",
+          "source": "icd10cm_to_icd11_2024_full"
+        },
+        {
+          "predicate": "normalizedTargetLabel",
+          "value": "chronic gingivitis",
+          "source": "icd10cm_to_icd11_2024_full"
+        }
+      ],
+      "rule_id": "R-EXACT-LABEL",
+      "sources": [
+        "icd10cm_to_icd11_2024_full"
+      ]
+    }
+  }
+}

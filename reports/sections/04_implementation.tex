@@ -1,0 +1,125 @@
+\chapter{Thiết kế và cài đặt hệ thống}\label{chap:implementation}
+
+\section{Kiến trúc xử lý}
+Lớp COKB nhận dữ liệu JSON chuẩn hóa hoặc dữ liệu chuyển đổi từ Oxigraph.
+Với lệnh build/reason/import, CLI kiểm tra cấu trúc trước, chỉ suy luận
+khi không có lỗi mức error, sau đó xuất store cùng các graph và proof.
+SHACL được gọi bằng lệnh riêng sau khi xuất RDF.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.65cm and 1.2cm,
+  block/.append style={text width=4.5cm}]
+  \node[block] (input) {JSON mẫu\\Adapter Oxigraph};
+  \node[block,below=of input] (validation) {Kiểm tra Python\\giá trị bắt buộc, trùng ID};
+  \node[block,right=of validation,text width=3.4cm] (quarantine) {Có lỗi: báo cáo\\và quarantine};
+  \node[block,below=of validation] (engine) {Operators + Rules\\đánh giá có thứ tự};
+  \node[block,below=of engine] (export) {Store JSON và ba file RDF\\Asserted / Inferred / Proof};
+  \node[block,below=of export] (query) {Query / Explain\\Assessment và bằng chứng};
+  \node[block,right=of export,text width=3.4cm] (shacl) {SHACL tùy chọn\\kiểm tra RDF đã xuất};
+  \draw[flow] (input)--(validation);
+  \draw[flow] (validation)--node[above,font=\scriptsize]{error}(quarantine);
+  \draw[flow] (validation)--node[left,font=\scriptsize]{hợp lệ}(engine);
+  \draw[flow] (engine)--(export);
+  \draw[flow] (export)--(query);
+  \draw[flow] (export)--(shacl);
+\end{tikzpicture}
+\caption{Luồng COKB được thực thi bởi các lệnh CLI hiện tại.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Phân rã module}
+\begin{table}[htbp]
+\centering\small
+\caption{Trách nhiệm các module của lớp COKB}\label{tab:modules}
+\begin{tabularx}{\textwidth}{p{4.0cm}Y}
+\toprule
+Module trong \src{scripts/cokb/} & Trách nhiệm\\
+\midrule
+\src{model.py} & Dataclass, enum mức đánh giá, ID ổn định, validation report.\\
+\src{operators.py} & Chuẩn hóa, tập từ, xung đột, điều kiện so sánh.\\
+\src{rules.py}, \src{reasoner.py} & Điều kiện luật, chọn luật, dựng assessment và proof.\\
+\src{validation.py}, \src{shacl.py} & Kiểm tra Python và kiểm tra RDF bằng pySHACL.\\
+\src{repository.py} & Nạp/lưu, truy vấn, giải thích, tuần tự hóa RDF và JSON.\\
+\src{importer.py} & Đọc Oxigraph ở chế độ read-only và chuyển cặp mã.\\
+\src{xlsx.py}, \src{evaluation.py} & Đọc sheet gold bằng thư viện chuẩn, tính chỉ số đánh giá.\\
+\src{cli.py} & Khai báo subcommand, kiểm soát luồng, mã thoát, xuất báo cáo.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Lõi suy luận và đọc XLSX có thể chạy bằng thư viện chuẩn Python.
+Theo \src{pyproject.toml}, môi trường project yêu cầu Python từ 3.11 đến
+trước 3.13; các phụ thuộc tùy chọn nhóm validation là
+\src{rdflib} và \src{pyshacl}. Lệnh import cần \src{pyoxigraph}.
+Các chức năng COKB được gọi từ \src{main.py} mà không phải cấu hình LLM.
+
+\section{Định danh và nhập dữ liệu}
+Nếu input chưa cung cấp ID, \src{stable_mapping_id} băm chuỗi nối hệ mã,
+mã nguồn, hệ mã và mã đích bằng SHA-256, lấy 16 ký tự hex đầu:
+\begin{equation}
+ id(m)=\texttt{mapping-}\ \Vert\
+ \operatorname{prefix}_{16}\!\left(
+ \operatorname{SHA256}(s_s\Vert | \Vert k_s\Vert | \Vert s_t\Vert | \Vert k_t)
+ \right).
+\end{equation}
+Định danh này bỏ qua label và evidence. Hai mapping có cùng bốn thành
+phần nhưng nguồn khác nhau có thể cùng ID; đây là giới hạn thiết kế,
+không phải cơ chế quản lý lịch sử nhiều bằng chứng.
+
+Adapter dùng SPARQL \texttt{SELECT DISTINCT} trong các named graph để lấy
+cặp mã và nhãn, rồi khử trùng theo bộ $(s_s,k_s,s_t,k_t)$.
+Các tham số \texttt{source-system}, \texttt{target-system} và
+\texttt{evidence-source} được truyền từ CLI, không được suy ra riêng cho
+từng dòng. Vì vậy, nếu nguồn chứa lẫn ICD10WHO và ICD10CM thì việc gán
+một hệ nguồn cho toàn bộ kết quả có thể làm sai metadata.
+Code cũng chưa bảo toàn graph IRI và mapping IRI của từng dòng làm provenance.
+
+\section{Xử lý lỗi và các artifact}
+Khi validation phát hiện error, CLI ghi
+\src{validation_report.json} và \src{quarantine.json}, trả mã thoát 1 và
+không tiếp tục inference của lần gọi đó. Cả batch bị dừng; không có cơ chế
+tự động xử lý phần hợp lệ còn lại. API \src{infer} và \src{explain}
+không tự bắt buộc validation, nên ứng dụng tích hợp phải gọi kiểm tra rõ ràng.
+
+Khi thành công, \src{save} tạo sáu artifact:
+\src{store.json}, \src{validation_report.json}, \src{proofs.json},
+\src{asserted_graph.ttl}, \src{inferred_graph.ttl}, \src{proof_graph.ttl}.
+SHACL hợp nhất ba file RDF cùng ontology để kiểm tra; tùy chọn suy luận
+RDFS trong bước này phục vụ nhận biết lớp và ràng buộc,
+không thay thế bộ đánh giá A/B/C bằng Python.
+
+\placeholderfigure{images/cli_demo.png}
+{Kết quả truy vấn COKB cho mã nguồn K05.1.}
+{Chụp terminal sau khi chạy cokb\_build và cokb\_query.
+Hiển thị hai target DA0B.Y và DA0Z, mức A và UNASSESSED,
+cùng mã luật của mỗi assessment. Chỉ dùng output thật của repo.}
+{fig:cli}
+
+\section{Ví dụ giải thích một mapping}
+Với cặp K05.1 và DA0B.Y trong fixture, hai nhãn đều là
+\emph{Chronic gingivitis}. Sau chuẩn hóa, cả hai thành
+\texttt{chronic gingivitis}. Luật đầu tiên khớp, trả A với hai premise
+là nhãn đã chuẩn hóa và nguồn do fixture khai báo.
+\begin{lstlisting}[caption={Trích phần proof của ví dụ nhãn trùng nhau},label={lst:proof}]
+{
+  "conclusion": {
+    "mapping_id": "mapping-k05-1-da0b-y",
+    "predicate": "hasMappingLevel",
+    "object": "A"
+  },
+  "rule_id": "R-EXACT-LABEL",
+  "sources": ["icd10cm_to_icd11_2024_full"]
+}
+\end{lstlisting}
+Mã minh họa~\ref{lst:proof} lược bỏ mảng premises cho gọn.
+Chuỗi source trong fixture là metadata tự khai báo; tên của nó không
+chứng minh ví dụ đã được xác minh với toàn bộ file ICD.
+
+\placeholderfigure{images/proof_graph.png}
+{Trực quan hóa vết suy luận cho mapping K05.1 đến DA0B.Y.}
+{Nạp ba file Turtle và ontology vào công cụ xem RDF.
+Vẽ các node mapping, assessment mức A, R-EXACT-LABEL,
+hai premise nhãn chuẩn hóa và evidence; ghi tên cạnh theo RDF đã xuất.
+Ảnh cần cho thấy đường đi từ assessment đến dữ kiện hỗ trợ.}
+{fig:proof}

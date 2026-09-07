@@ -1,0 +1,26 @@
+@prefix cokb: <http://iqvia.com/ontologies/cokb/> .
+
+cokb:assessment-mapping-k05-1-da0b-y a cokb:RuleBasedAssessment ;
+    cokb:assessesMapping cokb:mapping-k05-1-da0b-y ;
+    cokb:hasMappingLevel cokb:Level-A ;
+    cokb:producedByRule cokb:R-EXACT-LABEL .
+
+cokb:assessment-mapping-k05-1-da0z a cokb:RuleBasedAssessment ;
+    cokb:assessesMapping cokb:mapping-k05-1-da0z ;
+    cokb:hasMappingLevel cokb:Level-UNASSESSED ;
+    cokb:producedByRule cokb:R-INSUFFICIENT-EVIDENCE .
+
+cokb:assessment-mapping-k25-9-da60-y a cokb:RuleBasedAssessment ;
+    cokb:assessesMapping cokb:mapping-k25-9-da60-y ;
+    cokb:hasMappingLevel cokb:Level-C ;
+    cokb:producedByRule cokb:R-EXPLICIT-QUALIFIER-CONFLICT .
+
+cokb:assessment-mapping-a31-1b21-z a cokb:RuleBasedAssessment ;
+    cokb:assessesMapping cokb:mapping-a31-1b21-z ;
+    cokb:hasMappingLevel cokb:Level-A ;
+    cokb:producedByRule cokb:R-EXACT-LABEL .
+
+cokb:assessment-mapping-a31-1h0z a cokb:RuleBasedAssessment ;
+    cokb:assessesMapping cokb:mapping-a31-1h0z ;
+    cokb:hasMappingLevel cokb:Level-B ;
+    cokb:producedByRule cokb:R-GENERALIZED-CONDITION .

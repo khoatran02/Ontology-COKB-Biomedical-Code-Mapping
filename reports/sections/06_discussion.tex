@@ -1,0 +1,92 @@
+\chapter{Thảo luận, kết luận và hướng phát triển}
+
+\section{Đóng góp của đồ án}
+Đồ án cụ thể hóa bài toán ánh xạ mã thành các đối tượng, quan hệ, phép
+xử lý và luật có thể thực thi. Điều quan trọng đối với môn Biểu diễn tri
+thức là mối liên hệ giữa ba phần: tri thức được lưu dưới dạng gì, bộ suy
+luận sử dụng phần tri thức nào và người dùng kiểm tra kết quả bằng cách nào.
+Các module và công thức trong báo cáo thể hiện trực tiếp mối liên hệ đó.
+
+Kết quả thứ nhất là hợp đồng dữ liệu phân biệt assertion, assessment và
+proof. Kết quả thứ hai là bộ suy luận có thứ tự, có đầu ra từ chối rõ ràng.
+Kết quả thứ ba là bộ thực nghiệm vừa báo cáo độ chính xác, vừa thể hiện
+phần tri thức chưa được bao phủ. Những kết quả này giúp việc phát triển
+thêm luật có điểm xuất phát đo được.
+
+\section{Ý nghĩa trong một quy trình sử dụng}
+Trong một quy trình rà soát mapping, hệ thống có thể hỗ trợ người dùng
+nhóm các cặp theo assessment và mở bằng chứng để kiểm tra.
+Một chính sách nghiệp vụ tương lai có thể được mô hình hóa là
+\begin{equation}
+ d(m)=\operatorname{Policy}\bigl(f_{\K}(m),\operatorname{context}(m)\bigr).
+\end{equation}
+Ở đây $d$ là quyết định phê duyệt hoặc yêu cầu xem xét.
+\src{Policy} và \src{context} chưa được cài đặt trong repo.
+Việc tách này ngăn diễn giải sai rằng một mức A/B/C tự động tương đương
+với quyết định nghiệp vụ cuối cùng.
+
+Proof trace cho phép kiểm tra và phát hiện sai sót ở từng luật.
+\Unassessed{} tạo ra danh sách cụ thể các ca cần bổ sung tri thức.
+Đây là cơ sở để xây dựng công cụ hỗ trợ chuyên gia và theo dõi chất lượng
+dữ liệu. Khả năng giảm thời gian review hoặc giảm chi phí cần được đánh
+giá bằng một quy trình có người dùng và tiêu chí chấp nhận xác định.
+
+\section{Giới hạn cần nhìn nhận}
+\begin{table}[htbp]
+\centering\small
+\caption{Khoảng cách giữa hiện thực hiện tại và hệ thống hoàn chỉnh}\label{tab:gaps}
+\begin{tabularx}{\textwidth}{p{3.0cm}YY}
+\toprule
+Khía cạnh & Hiện tại & Phần cần bổ sung\\
+\midrule
+Ngữ nghĩa & Chuỗi, bí danh nhỏ, tập từ, cặp từ đối lập. &
+Đồng nghĩa có nguồn, phủ định, quan hệ phân cấp có kiểm chứng.\\
+COKB & Sáu nhóm thành phần được vận dụng trong miền hẹp. &
+Đối tượng có hành vi nội tại và bộ giải tổng quát nếu mục tiêu mở rộng đòi hỏi.\\
+Provenance & ID nguồn và mã luật. &
+Phiên bản nguồn, hash luật, thời điểm, tác nhân và lịch sử phê duyệt.\\
+Mapping phức hợp & Target đơn trong Python. &
+Ngữ nghĩa OneOf/AllOf và kiểm thử tương ứng.\\
+Đánh giá & 500 cặp gold, coverage thấp. &
+Bộ holdout độc lập, ablation, kiểm định với chuyên gia.\\
+Triển khai & CLI và file JSON/Turtle. &
+API, quản lý người dùng, policy và quy trình review.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Một hạn chế bổ sung là ontology và rule catalog chưa được dùng làm
+nguồn thực thi thống nhất. Thay đổi Turtle hoặc JSON catalog mà không sửa
+Python có thể làm tài liệu và hành vi khác nhau. Tính nhất quán giữa các
+biểu diễn cần được kiểm tra khi mở rộng.
+
+Graph đầy đủ chưa có trong checkout. Indexer có cơ chế nạp dữ liệu mẫu
+nếu không đọc được TTL thực, nên việc một lệnh indexing hoàn thành
+không đủ chứng minh rằng toàn bộ dữ liệu ICD đã được nạp.
+Trong lần kiểm tra dùng cho báo cáo, store có 0 quad. Cần kiểm tra số lượng,
+hệ mã và provenance sau import trước khi thực nghiệm quy mô lớn.
+
+\section{Hướng phát triển ưu tiên}
+Ưu tiên thứ nhất là nâng chất lượng tri thức nhãn: bổ sung xử lý phủ định
+và đồng nghĩa có kiểm thử hồi quy, sau đó đánh giá trên tập độc lập.
+Ưu tiên thứ hai là hoàn thiện provenance và proof: lưu phiên bản nguồn,
+hash ruleset, các tập từ đã tính và lý do các luật không khớp.
+Ưu tiên thứ ba là phục hồi dữ liệu graph đầy đủ, xử lý đúng hệ mã của từng
+dòng và báo cáo số lượng mapping thực sự đã nạp.
+
+Sau các bước đó có thể thử tích hợp lớp giao tiếp ngôn ngữ tự nhiên.
+Kết quả do model tạo cần có loại assessment riêng và được đánh giá đối
+chiếu với luật; hiện chưa có thực nghiệm hybrid trong đồ án.
+Nếu tiếp tục theo COKB tổng quát, cần thiết kế rõ tập loại sự kiện,
+hành vi đối tượng và chiến lược suy diễn, thay vì chỉ bổ sung thêm tên
+class vào ontology.
+
+\section{Kết luận}
+Đồ án cho thấy cách đưa tri thức kiểm tra mapping vào một cấu trúc có
+thể vận hành: đối tượng và quan hệ để biểu diễn, toán tử và luật để
+đánh giá, proof để giải thích, validation để kiểm tra dữ liệu.
+Thực nghiệm xác nhận các thành phần này hoạt động trên phạm vi hiện có,
+đồng thời chỉ ra giới hạn bao phủ 4,40\%.
+Ý nghĩa thực tế của COKB ở đây là cung cấp những nhận định có thể kiểm tra
+và nhận diện rõ các ca chưa đủ tri thức, làm nền cho quy trình rà soát
+mapping có sự tham gia của chuyên gia.

@@ -1,5 +1,6 @@
 import logging
 import os
+import ast
 from typing import Union
 from pathlib import Path
 from statistics import mean, stdev
@@ -26,15 +27,16 @@ def extract_code_from_result(llm_response: str, llm_model_name: str):
         end = llm_response.find("}")
         if start != -1 and end != -1:
             try:
-                code_list = eval(llm_response[start:end+1])["ICD10CM"].split(", ")
-            except:
-                pass
+                code_list = ast.literal_eval(llm_response[start:end+1])["ICD10CM"].split(", ")
+            except (SyntaxError, ValueError, KeyError, TypeError):
+                code_list = []
     else:
         try:
-            result_dict = eval(llm_response)
-            code_list = list(result_dict.values())
-            code_list = [i.strip() for i in code_list]
-        except SyntaxError:
+            result_dict = ast.literal_eval(llm_response)
+            code_list = []
+            for value in result_dict.values():
+                code_list.extend(item.strip() for item in str(value).split(","))
+        except (SyntaxError, ValueError, TypeError, AttributeError):
             code_list = []
     return code_list
 
@@ -107,4 +109,3 @@ def evaluate(gold_path: Union[Path, str], pred_path: Union[Path, str], model_nam
     else:
         raise ValueError("Expecting prediction results to be either a file or a directory containing only "
                          "prediction result files. Please check the path!")
-

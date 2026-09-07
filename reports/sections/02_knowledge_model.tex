@@ -1,0 +1,129 @@
+\chapter{Mô hình biểu diễn tri thức}\label{chap:model}
+\section{Vận dụng mô hình COKB}
+Mô hình COKB tổ chức tri thức theo sáu thành phần
+\begin{equation}
+  \K=(C,H,R,\mathrm{Ops},\mathrm{Funcs},\mathrm{Rules}).
+  \label{eq:cokb}
+\end{equation}
+Trong lý thuyết, $C$ chứa các lớp đối tượng tính toán; $H$ mô tả phân cấp;
+$R$ là các quan hệ khác; $\mathrm{Ops}$ và $\mathrm{Funcs}$ mô tả phép toán
+và hàm; $\mathrm{Rules}$ chứa các luật suy diễn~\cite{do2015}.
+
+Đồ án vận dụng cách tổ chức này cho bài toán ánh xạ mã.
+Các đối tượng Python hiện chủ yếu là cấu trúc dữ liệu bất biến; các hành vi
+đánh giá được đặt trong operators, rules và reasoner.
+Vì vậy, đây là \emph{một hiện thực chuyên biệt theo cấu trúc COKB};
+chưa hiện thực đầy đủ cơ chế đối tượng tự giải, giải phương trình nội bộ,
+hay suy diễn đến bao đóng của một hệ COKB tổng quát.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Đối chiếu sáu thành phần COKB với source code}\label{tab:cokb}
+\begin{tabularx}{\textwidth}{lYY}
+\toprule
+Thành phần & Cụ thể hóa trong đồ án & Hiện thực và giới hạn\\
+\midrule
+$C$ & CodeConcept, MappingAssertion, MappingAssessment, ProofTrace. &
+\src{model.py} và vocabulary Turtle; một số lớp chỉ có trong schema.\\
+$H$ & Phân cấp hệ mã, loại assessment, loại target. &
+\src{rdfs:subClassOf}; không phải cây phân cấp bệnh dùng để suy luận nhãn.\\
+$R$ & mapsFrom, mapsTo, assessesMapping, hasPremise. &
+Quan hệ RDF do \src{repository.py} xuất.\\
+Ops & Chuẩn hóa mã/nhãn, tìm xung đột, so sánh tập từ. &
+\src{operators.py}; khử trùng cặp trong \src{importer.py}.\\
+Funcs & Tìm mapping, đánh giá, giải thích, xuất kho tri thức. &
+\src{find_mappings}, \src{infer}, \src{explain}, \src{save}.\\
+Rules & Năm luật có ưu tiên và vết suy luận. &
+\src{rules.py}, \src{reasoner.py}; logic chạy bằng Python.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tên file Python trong bảng nằm dưới \src{scripts/cokb/}.
+Ontology nằm ở \src{ontology/biomedical_mapping_cokb.ttl}.
+Các cá thể Operator, Function và InferenceRule trong Turtle đóng vai trò
+danh mục tri thức; chúng không tự thực thi được. Danh mục
+\src{rules/mapping_rules.json} cũng không phải ngôn ngữ luật mà reasoner
+đọc để chạy. Thứ tự thực thi thật được quyết định bởi \src{DEFAULT_RULES}.
+
+\section{Các đối tượng và quan hệ}
+\src{CodeConcept} gồm hệ mã, mã và nhãn. \src{MappingAssertion} liên kết hai
+CodeConcept với bằng chứng nguồn. \src{MappingAssessment} bổ sung mức đánh
+giá, loại tác nhân, lời giải thích và proof. \src{Premise} chứa bộ ba
+thuộc tính \texttt{predicate}, \texttt{value}, \texttt{source}.
+Những thuộc tính này thể hiện cụ thể tri thức mà phép đánh giá được phép dùng.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.9cm and 1.4cm]
+  \node[block] (mapping) {MappingAssertion};
+  \node[block,above left=of mapping,text width=2.8cm] (source) {CodeConcept\\nguồn};
+  \node[block,above right=of mapping,text width=2.8cm] (target) {CodeConcept\\đích};
+  \node[block,below=of mapping] (assessment) {MappingAssessment\\A / B / C / UNASSESSED};
+  \node[block,below=of assessment] (proof) {ProofTrace\\luật và bằng chứng};
+  \node[block,right=of proof,text width=2.5cm] (premise) {Premise};
+  \draw[flow] (mapping) -- node[left,font=\scriptsize]{mapsFrom} (source);
+  \draw[flow] (mapping) -- node[right,font=\scriptsize]{mapsTo} (target);
+  \draw[flow] (assessment) -- node[right,font=\scriptsize]{assessesMapping} (mapping);
+  \draw[flow] (proof) -- node[right,font=\scriptsize]{provesAssessment} (assessment);
+  \draw[flow] (proof) -- node[above,font=\scriptsize]{hasPremise} (premise);
+\end{tikzpicture}
+\caption{Các đối tượng trung tâm và chiều quan hệ được xuất trong RDF.}
+\label{fig:objects}
+\end{figure}
+
+Điểm đáng chú ý ở Hình~\ref{fig:objects} là mức A/B/C thuộc về
+\emph{assessment của mapping}. Dữ kiện “mapping tồn tại” và kết luận
+“mapping được đánh giá mức A” có chủ thể và trách nhiệm khác nhau.
+Trong JSON, proof ghi \texttt{mapping\_id} cùng predicate và object;
+trong RDF, liên kết \texttt{hasMappingLevel} xuất phát từ assessment.
+
+\section{Phân cấp và mức độ hoàn thiện}
+Ontology khai báo \src{BiomedicalCodeSystem} là lớp con của
+\src{CodeSystem}; các lớp ICD nằm dưới \src{BiomedicalCodeSystem}.
+Các lớp \src{RuleBasedAssessment}, \src{ModelAssessment},
+\src{HumanAssessment} nằm dưới \src{MappingAssessment}.
+Tuy nhiên, dữ liệu CodeConcept hiện ghi tên hệ mã bằng chuỗi
+\src{codeSystem}; chưa liên kết tới một cá thể CodeSystem được quản lý phiên bản.
+
+Tương tự, \src{SimpleTarget}, \src{OneOfTarget}, \src{AllOfTarget} đã có
+trong vocabulary, nhưng \src{MappingAssertion} Python chỉ chứa một
+\src{target}. Không thể suy từ việc có tên lớp trong ontology rằng
+chương trình đã giải được lựa chọn “một trong nhiều mã” hoặc tổ hợp
+“phải dùng đồng thời nhiều mã”.
+
+\section{Dữ kiện nguồn, kết luận và bằng chứng}
+Kho tri thức được xuất thành ba file:
+\begin{equation}
+  G_{\mathrm{export}}=G_{\mathrm{asserted}}\cup
+  G_{\mathrm{inferred}}\cup G_{\mathrm{proof}}.
+\end{equation}
+\src{asserted_graph.ttl} lưu cặp mã, nhãn, tác nhân và nguồn.
+\src{inferred_graph.ttl} lưu assessment, mức đánh giá và luật.
+\src{proof_graph.ttl} lưu các premise cùng liên kết tới assessment.
+Đây là ba tài liệu Turtle; lệnh xuất hiện tại không tự tạo ba named graph
+trong một RDF Dataset.
+
+Quan hệ \src{prov:wasDerivedFrom} được dùng để liên kết mapping với
+EvidenceSource, phù hợp với mục đích mô tả nguồn gốc dữ liệu của
+PROV-O~\cite{provo}. Ở bản cài đặt hiện tại, evidence là định danh chuỗi
+do fixture hoặc tham số import cung cấp. Chưa có cơ chế xác thực nội dung
+nguồn, snapshot nguồn, timestamp hay hash phiên bản luật trong proof.
+Do đó, truy vết cấu trúc đã có nhưng khả năng kiểm toán lịch sử còn hạn chế.
+
+\section{Ràng buộc tính hợp lệ}
+Kiểm tra Python yêu cầu đủ hệ mã, mã, nhãn nguồn/đích và evidence source;
+phát hiện trùng \texttt{mapping\_id}; cảnh báo ánh xạ một mã tới chính nó.
+Kiểm tra SHACL áp dụng ràng buộc số lượng và kiểu liên kết trên dữ liệu
+RDF~\cite{shacl}. Ví dụ, một assertion phải có đúng một \src{mapsFrom},
+đúng một \src{mapsTo} và ít nhất một \src{prov:wasDerivedFrom}.
+
+Gọi $V(M)$ là tập lỗi của một tập mapping $M$, trạng thái hợp lệ trong code là
+\begin{equation}
+  \operatorname{conforms}(M)
+  \iff \nexists v\in V(M):\operatorname{severity}(v)=\texttt{error}.
+\end{equation}
+Một warning không làm trạng thái này chuyển thành false.
+Tính hợp lệ về cấu trúc không chứng minh tính đúng của nhãn hay mapping.
+Chẳng hạn, một chuỗi evidence sai nội dung nhưng không rỗng vẫn có thể
+vượt qua kiểm tra hiện tại.

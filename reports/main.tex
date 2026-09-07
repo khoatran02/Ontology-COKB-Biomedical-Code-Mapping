@@ -1,0 +1,183 @@
+% Compile from reports/: latexmk -xelatex main.tex (or tectonic main.tex).
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T5]{fontenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+  \setmainfont{texgyretermes-regular.otf}[
+    BoldFont=texgyretermes-bold.otf,ItalicFont=texgyretermes-italic.otf,
+    BoldItalicFont=texgyretermes-bolditalic.otf]
+  \setsansfont{texgyreheros-regular.otf}[
+    BoldFont=texgyreheros-bold.otf,ItalicFont=texgyreheros-italic.otf,
+    BoldItalicFont=texgyreheros-bolditalic.otf]
+  \setmonofont{texgyrecursor-regular.otf}[Scale=0.86,
+    BoldFont=texgyrecursor-bold.otf,ItalicFont=texgyrecursor-italic.otf,
+    BoldItalicFont=texgyrecursor-bolditalic.otf]
+\fi
+\usepackage[margin=2.6cm,headheight=16pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,tabularx,longtable,array}
+\usepackage{graphicx,xcolor}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
+\pgfplotsset{compat=1.18}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{placeins}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage[unicode,bookmarksnumbered]{hyperref}
+\definecolor{accent}{HTML}{1F536E}
+\definecolor{lightbg}{HTML}{F2F6F8}
+\definecolor{okcolor}{HTML}{38806D}
+\definecolor{warncolor}{HTML}{BA6D35}
+\hypersetup{colorlinks=true,linkcolor=accent,citecolor=accent,urlcolor=accent,
+  pdftitle={Ứng dụng mô hình Ontology COKB trong đánh giá và giải thích ánh xạ mã y sinh},
+  pdfauthor={Trần Hoàng Anh Khoa}}
+\renewcommand{\contentsname}{Mục lục}
+\renewcommand{\listfigurename}{Danh mục hình}
+\renewcommand{\listtablename}{Danh mục bảng}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+\renewcommand{\bibname}{Tài liệu tham khảo}
+\renewcommand{\chaptername}{Chương}
+\renewcommand{\appendixname}{Phụ lục}
+\renewcommand{\lstlistingname}{Mã minh họa}
+\titleformat{\chapter}[display]{\bfseries\Large\color{accent}}
+  {\chaptertitlename\ \thechapter}{8pt}{\LARGE}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\setlength{\parindent}{1.2em}
+\setlength{\parskip}{0.35em}
+\linespread{1.12}
+\setlength{\emergencystretch}{3em}
+\clubpenalty=10000
+\widowpenalty=10000
+\setlist{nosep,topsep=5pt,leftmargin=*}
+\renewcommand{\arraystretch}{1.18}
+\captionsetup{font=small,labelfont=bf}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Đồ án Biểu diễn tri thức và ứng dụng}
+\fancyhead[R]{\small Ontology COKB}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\lstset{basicstyle=\ttfamily\footnotesize,backgroundcolor=\color{lightbg},
+  frame=single,rulecolor=\color{accent!30},breaklines=true,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,
+  keywordstyle=\color{accent}\bfseries,commentstyle=\color{okcolor},
+  aboveskip=8pt,belowskip=8pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\src}[1]{\path{#1}}
+\newcommand{\Unassessed}{\texttt{UNASSESSED}}
+\newcommand{\Ind}{\mathbf{1}}
+\newcommand{\K}{\mathcal{K}}
+% Add an image at the indicated path to replace its placeholder automatically.
+\newcommand{\placeholderfigure}[4]{%
+  \begin{figure}[htbp]\centering
+  \IfFileExists{#1}{\includegraphics[width=0.92\linewidth,height=0.48\textheight,keepaspectratio]{#1}}{%
+    \fcolorbox{accent!50}{lightbg}{\begin{minipage}[c][4.3cm][c]{0.88\linewidth}
+      \centering\textbf{Vị trí bổ sung hình minh họa}\par\smallskip
+      \small #3\par\medskip
+      \footnotesize Tệp dự kiến: \path{#1}
+    \end{minipage}}}
+  \caption{#2}\label{#4}
+  \end{figure}}
+\tikzset{block/.style={draw=accent,fill=lightbg,rounded corners=2pt,
+  align=center,font=\small,minimum height=1cm,text width=3.6cm},
+  flow/.style={-{Latex[length=2mm]},thick,draw=accent}}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+  \centering
+  {\large\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\par}
+  \vspace{0.25cm}
+  {\large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+  \vspace{1.1cm}
+  \includegraphics[width=0.30\textwidth]{images/vnu_hcmus_logo.png}
+  \vspace{1.1cm}
+
+  {\Large\bfseries BÁO CÁO ĐỒ ÁN MÔN HỌC\par}
+  \vspace{0.35cm}
+  {\large BIỂU DIỄN TRI THỨC VÀ ỨNG DỤNG\par}
+  \vspace{1cm}
+  {\LARGE\bfseries\color{accent} ỨNG DỤNG MÔ HÌNH ONTOLOGY COKB\\[0.3em]
+  TRONG ĐÁNH GIÁ VÀ GIẢI THÍCH\\[0.3em] ÁNH XẠ MÃ Y SINH\par}
+  \vspace{0.6cm}
+  \vfill
+  \begin{tabular}{ll}
+    Giảng viên hướng dẫn: & PGS.TS. Đỗ Văn Nhơn\\
+    Học viên thực hiện: & 1. Trần Hoàng Anh Khoa -- 25C01037\\
+                       & 2. Hồ Võ Hoàng Duy -- 25C01002
+  \end{tabular}
+  \vfill
+  Thành phố Hồ Chí Minh, tháng 9 năm 2026
+\end{titlepage}
+\pagenumbering{roman}
+\hypersetup{pageanchor=true}
+\chapter*{Tóm tắt}
+\addcontentsline{toc}{chapter}{Tóm tắt}
+Báo cáo trình bày việc vận dụng mô hình Ontology COKB để tổ chức, đánh giá
+và giải thích dữ liệu ánh xạ giữa các hệ thống mã y sinh. Bài toán đặt ra là:
+với một cặp mã nguồn--đích đã có, hệ thống có thể đưa ra nhận định nào,
+dựa trên điều kiện nào và phải để lại bằng chứng gì để người dùng kiểm tra?
+Đồ án xây dựng lớp tri thức gồm ontology, ràng buộc dữ liệu, toán tử xử lý nhãn,
+năm luật đánh giá có thứ tự ưu tiên và vết suy luận có cấu trúc.
+
+Phần cài đặt sử dụng Python và RDF/Turtle; SHACL được cung cấp như một bước
+kiểm tra bổ sung. Dữ kiện nguồn, kết quả đánh giá và vết suy luận được xuất
+thành ba nhóm dữ liệu riêng. Bộ suy luận trả về A, B, C hoặc
+\Unassessed; trạng thái cuối thể hiện rằng tập luật chưa xác lập được kết luận.
+Đây là một vận dụng COKB trong miền hẹp, với luật xử lý nhãn được hiện thực
+bằng Python, chưa phải bộ giải đối tượng tính toán tổng quát.
+
+Thực nghiệm tái lập trên 500 cặp nhãn đạt độ bao phủ 4,40\% và độ chính xác
+95,45\% trong 22 cặp được đánh giá; độ chính xác tính trên toàn bộ tập là
+4,20\%. Kết quả cho thấy cơ chế suy luận và truy vết hoạt động, đồng thời
+chỉ ra giới hạn lớn về độ bao phủ. Giá trị thực tế của đồ án nằm ở khả năng
+hỗ trợ rà soát ánh xạ một cách nhất quán, chỉ rõ nguồn gốc kết luận và
+nhận diện các trường hợp cần chuyên gia xem xét.
+
+\noindent\textbf{Từ khóa:} COKB, biểu diễn tri thức, ánh xạ mã y sinh,
+luật suy luận, RDF, SHACL, vết suy luận.
+\tableofcontents
+\listoffigures
+\listoftables
+\chapter*{Danh mục thuật ngữ}
+\addcontentsline{toc}{chapter}{Danh mục thuật ngữ}
+\begin{tabularx}{\textwidth}{lY}
+\toprule
+Thuật ngữ & Diễn giải trong báo cáo\\
+\midrule
+COKB & Computational Object Knowledge Base: mô hình cơ sở tri thức đối tượng tính toán.\\
+ICD & International Classification of Diseases: hệ thống phân loại bệnh.\\
+RDF & Resource Description Framework: biểu diễn dữ liệu bằng bộ ba.\\
+SHACL & Shapes Constraint Language: mô tả và kiểm tra ràng buộc trên graph RDF.\\
+Assertion & Phát biểu ánh xạ được nạp từ nguồn, chưa đồng nghĩa với ánh xạ đúng.\\
+Assessment & Kết quả đánh giá một phát biểu ánh xạ.\\
+Proof trace & Vết suy luận gồm kết luận, tiền đề, mã luật và nguồn bằng chứng.\\
+Coverage & Tỷ lệ cặp nhãn được gán A, B hoặc C.\\
+Abstention & Việc hệ thống trả về \Unassessed{} thay vì gán A/B/C.\\
+\bottomrule
+\end{tabularx}
+\clearpage
+\pagenumbering{arabic}
+\input{sections/01_problem}
+\input{sections/02_knowledge_model}
+\input{sections/03_reasoning}
+\input{sections/04_implementation}
+\input{sections/05_evaluation}
+\input{sections/06_discussion}
+\appendix
+\input{sections/07_reproduction}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+\input{references}
+\end{document}

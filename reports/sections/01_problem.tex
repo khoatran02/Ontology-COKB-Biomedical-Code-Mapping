@@ -1,0 +1,86 @@
+\chapter{Bài toán và ý nghĩa thực tế}\label{chap:problem}
+\section{Động cơ thực hiện}
+Trong tích hợp dữ liệu, cùng một nội dung bệnh học có thể được mô tả bằng
+các hệ thống mã khác nhau. Một bảng ánh xạ cung cấp các cặp mã ứng viên,
+nhưng việc có mặt trong bảng chưa giải quyết được câu hỏi về mức độ phù hợp
+của từng cặp. Người kiểm tra cần biết nhãn có tương ứng hay không, có khác
+mức độ chi tiết hay có từ ngữ chỉ tình trạng xung đột. Nhu cầu hỗ trợ chuyên
+gia kiểm tra các ứng viên ánh xạ cũng là bối cảnh của công trình
+OntologyRAG~\cite{ontologyrag2025}.
+
+Đồ án sử dụng mã nguồn và dữ liệu hiện có trong repository làm nền tảng,
+tập trung vào lớp tri thức COKB. Vấn đề cốt lõi là xây dựng một quy trình
+\emph{đánh giá có căn cứ}: cùng dữ kiện và cùng phiên bản luật phải cho
+cùng nhận định, đồng thời cho phép truy ngược nhận định đó đến tiền đề và nguồn.
+
+\section{Phát biểu bài toán}
+Mỗi ứng viên ánh xạ được mô hình hóa bởi
+\begin{equation}
+  m=(id,c_s,c_t,e,b),\qquad c=(s,k,\ell),
+  \label{eq:mapping}
+\end{equation}
+trong đó $id$ là định danh; $c_s,c_t$ là khái niệm nguồn và đích;
+$s$ là tên hệ mã; $k$ là giá trị mã; $\ell$ là nhãn;
+$e$ là nguồn bằng chứng; $b$ là tác nhân khai báo.
+Đầu ra của hệ thống là
+\begin{equation}
+  f_{\K}(m)=(y,\tau,\pi),\qquad
+  y\in\{A,B,C,\bot\},\quad \tau=\texttt{rule\_based},
+  \label{eq:task}
+\end{equation}
+với $\bot$ tương ứng \Unassessed{} và $\pi$ là vết suy luận.
+Tập tri thức $\K$ bao gồm mô hình dữ liệu, các phép xử lý và tập luật được
+chọn cho lần chạy. Việc tìm ra mã đích mới ngoài các ứng viên đầu vào
+không nằm trong hàm $f_{\K}$.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Ý nghĩa đầu ra và cách sử dụng dự kiến}\label{tab:practical}
+\begin{tabularx}{\textwidth}{lYY}
+\toprule
+Đầu ra & Diễn giải theo bộ luật hiện tại & Hỗ trợ công việc nào?\\
+\midrule
+A & Nhãn trùng nhau sau chuẩn hóa. & Đưa các cặp dễ kiểm tra vào nhóm đề xuất xác nhận.\\
+B & Thỏa điều kiện bao hàm từ hoặc khái quát hóa theo heuristic. & Chú ý khác biệt về nhãn; kiểm tra thêm ngữ cảnh.\\
+C & Phát hiện cặp từ/cụm từ đối lập đã khai báo. & Đưa vào nhóm cảnh báo xung đột.\\
+$\bot$ & Không có luật A/B/C nào khớp. & Giữ lại cho chuyên gia hoặc bổ sung bằng chứng.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Các hành động nghiệp vụ trong Bảng~\ref{tab:practical} là cách sử dụng
+được đề xuất. Code hiện trả assessment và proof; chưa có bộ chính sách
+phê duyệt, hàng đợi chuyên gia hay chức năng tự động chuyển dữ liệu bệnh viện.
+Đặc biệt, A là kết quả so sánh nhãn theo thuật toán, không phải chứng nhận
+tương đương y khoa giữa hai khái niệm.
+
+\section{COKB mang lại giá trị gì?}
+Giá trị thứ nhất là \textbf{biến tiêu chí kiểm tra thành tri thức có thể thực thi}.
+Ví dụ, tiêu chí “hai nhãn trùng nhau sau chuẩn hóa” được đóng gói thành
+một luật có định danh. Khi tiêu chí thay đổi, người phát triển biết phải
+sửa thành phần nào và đo lại ảnh hưởng lên dữ liệu nào.
+
+Giá trị thứ hai là \textbf{giải trình được một quyết định cụ thể}.
+Với một cảnh báo xung đột, hệ thống cung cấp cả hai nhãn và danh sách
+cụm từ đã kích hoạt luật. Chuyên gia có thể nhận ra cảnh báo đúng hoặc phát
+hiện lỗi do thuật toán hiểu sai phủ định. Đây là lợi ích trực tiếp của
+proof trace đối với kiểm tra chất lượng dữ liệu.
+
+Giá trị thứ ba là \textbf{biểu diễn rõ giới hạn hiểu biết}.
+\Unassessed{} giữ lại những cặp mà luật chưa xử lý được. Nếu được tích hợp
+vào quy trình rà soát, trạng thái này giúp hình thành danh sách cần kiểm tra
+và giúp nhóm phát triển ưu tiên bổ sung tri thức. Tác dụng tiết kiệm thời gian
+cho chuyên gia vẫn cần được đo bằng nghiên cứu người dùng; đồ án chưa có
+thực nghiệm xác nhận lợi ích định lượng đó.
+
+\section{Mục tiêu và phạm vi}
+Đồ án hướng đến bốn kết quả: mô hình hóa các đối tượng và quan hệ của ánh xạ;
+hiện thực các phép kiểm tra cùng luật đánh giá; xuất được kết luận kèm vết
+suy luận; và đánh giá chất lượng bằng dữ liệu có nhãn tham chiếu.
+Các ví dụ ICD chỉ được diễn giải theo nhãn có trong repository.
+
+Phạm vi thực nghiệm gồm năm mapping mẫu và 500 cặp nhãn gold.
+Hệ thống chưa xử lý đầy đủ ngữ nghĩa phân cấp bệnh, phiên bản ICD,
+ngữ cảnh lâm sàng hoặc ánh xạ đích dạng tổ hợp. Báo cáo phân biệt các
+khả năng đã chạy được, các khái niệm chỉ mới khai báo trong ontology
+và các hướng ứng dụng cần triển khai thêm.
