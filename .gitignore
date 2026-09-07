@@ -3,7 +3,6 @@
 # project data folder
 data/*
 # build folder
-build
 *.egg-info
 # default venvs
 .venv
